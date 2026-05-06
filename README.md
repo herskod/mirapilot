@@ -1,4 +1,4 @@
-# MIRA — Multidimensional Instrument for Recommending Academic-track through AI
+# MIRA — Multidimensional Instrument for Recommending Academic track through AI
 
 > **Reducing demographic bias in Italian secondary-school track recommendations using psychometric profiles and large language models.**
 
