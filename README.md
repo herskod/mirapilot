@@ -106,7 +106,7 @@ No API key is bundled in the code. The browser must have access to the Anthropic
 
 **Project:** Social Policy Challenge — Data, Inequality and Human Capital, Bocconi University  
 **Authors:** Yael Brianzi, Zoe Di Lieto, David Herskovits, Agnese Porro  
-**Advisor:** Prof. Jacopo Di Tullio (assessment pipeline design)
+**Advise on assessment pipeline design:** Prof. Jacopo Di Tullio 
 
 **Key references:**
 - Carlana, M. (2019). Implicit stereotypes: Evidence from teachers' gender bias. *Quarterly Journal of Economics*, 134(3).
