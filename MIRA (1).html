@@ -1,0 +1,3661 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIRA — Multidimensional Instrument for Recommending Academic-track through AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1e3a5f;
+  --navy-light: #2d5282;
+  --blue: #2563eb;
+  --blue-mid: #3b82f6;
+  --blue-pale: #dbeafe;
+  --blue-xpale: #eff6ff;
+  --green: #059669;
+  --green-pale: #d1fae5;
+  --amber: #d97706;
+  --amber-pale: #fef3c7;
+  --red: #dc2626;
+  --red-pale: #fee2e2;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,h2,h3 { font-family: 'Crimson Pro', serif; line-height: 1.2; }
+
+/* ─── DISCLAIMER BANNER ─── */
+.disclaimer {
+  background: linear-gradient(135deg, var(--amber) 0%, #f59e0b 100%);
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ─── NAVBAR ─── */
+nav {
+  background: var(--navy);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: sticky;
+  top: 33px;
+  z-index: 90;
+  box-shadow: var(--shadow-md);
+}
+
+.nav-brand {
+  color: white;
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 14px 24px 14px 0;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.nav-brand span { color: #60a5fa; }
+
+.nav-tab {
+  color: rgba(255,255,255,0.7);
+  padding: 16px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+.nav-tab.active {
+  color: white;
+  border-bottom-color: #60a5fa;
+  background: rgba(96,165,250,0.1);
+}
+
+.nav-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-weight: 800;
+}
+.badge-student { background: var(--green); color: white; }
+.badge-teacher { background: var(--amber); color: white; }
+
+/* ─── MAIN CONTAINER ─── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* ─── SECTION VIEWS ─── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ─── PROGRESS BAR ─── */
+.progress-container {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 60px;
+  position: relative;
+}
+
+.step-dot::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: -50%;
+  right: 50%;
+  height: 2px;
+  background: var(--gray-200);
+  z-index: 0;
+}
+
+.step-dot:first-child::before { display: none; }
+
+.step-dot.completed::before { background: var(--green); }
+.step-dot.active::before { background: linear-gradient(90deg, var(--green), var(--blue)); }
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  border: 2px solid var(--gray-200);
+  background: white;
+  color: var(--gray-400);
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+.step-dot.completed .step-circle {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.step-dot.active .step-circle {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+  box-shadow: 0 0 0 4px var(--blue-pale);
+}
+
+.step-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.step-dot.active .step-label { color: var(--blue); }
+.step-dot.completed .step-label { color: var(--green); }
+
+.progress-bar-wrap {
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.icon-blue { background: var(--blue-pale); }
+.icon-green { background: var(--green-pale); }
+.icon-amber { background: var(--amber-pale); }
+
+.card-title { font-size: 22px; color: var(--navy); margin-bottom: 4px; }
+.card-subtitle { font-size: 14px; color: var(--gray-500); }
+
+/* ─── FORMS ─── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full-width { grid-column: 1 / -1; }
+
+label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+select, input[type="number"], input[type="text"] {
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  color: var(--gray-800);
+  background: white;
+  transition: border-color 0.2s;
+  appearance: none;
+  width: 100%;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-pale);
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: white;
+}
+.btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+.btn-success {
+  background: var(--green);
+  color: white;
+}
+.btn-success:hover { background: #047857; transform: translateY(-1px); }
+
+.btn-outline {
+  background: white;
+  color: var(--navy);
+  border: 2px solid var(--gray-200);
+}
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+.btn-navy {
+  background: var(--navy);
+  color: white;
+}
+.btn-navy:hover { background: var(--navy-light); }
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+/* ─── CFT SUBTEST ─── */
+.timer-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--navy);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.timer-display {
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  font-weight: 600;
+  min-width: 56px;
+}
+
+.timer-display.warning { color: #fca5a5; }
+.timer-label { font-size: 13px; opacity: 0.8; }
+
+.timer-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.timer-fill {
+  height: 100%;
+  background: #60a5fa;
+  border-radius: 99px;
+  transition: width 1s linear;
+}
+
+.timer-fill.warning { background: #fca5a5; }
+
+/* ─── SVG QUESTION LAYOUT ─── */
+.question-area {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.question-number {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.question-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* ─── CFT SERIES: sequence + choices ─── */
+.series-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.series-item {
+  width: 70px;
+  height: 70px;
+  border: 2px solid var(--gray-300);
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.series-item.missing {
+  border: 2px dashed var(--blue);
+  background: var(--blue-xpale);
+}
+
+.series-arrow {
+  color: var(--gray-400);
+  font-size: 20px;
+}
+
+.choices-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.choice-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.choice-box {
+  width: 70px;
+  height: 70px;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.choice-box:hover { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-pale); }
+.choice-item.selected .choice-box {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  box-shadow: 0 0 0 3px var(--blue-pale);
+}
+
+.choice-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  color: var(--gray-600);
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.choice-item.selected .choice-letter {
+  background: var(--blue);
+  color: white;
+}
+
+/* ─── CLASSIF: 5 items side by side ─── */
+.classif-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ─── MATRICI: 3x3 grid ─── */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.matrix-cell {
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--gray-300);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matrix-cell.missing {
+  border: 2px dashed var(--blue);
+  background: var(--blue-xpale);
+}
+
+/* ─── INVALSI QUESTIONS ─── */
+.invalsi-text {
+  background: #fffbf0;
+  border-left: 4px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 20px;
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--gray-700);
+}
+
+.question-nav-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.q-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--gray-500);
+  transition: all 0.2s;
+}
+
+.q-dot:hover { border-color: var(--blue); color: var(--blue); }
+.q-dot.answered { background: var(--blue); border-color: var(--blue); color: white; }
+.q-dot.current { background: var(--navy); border-color: var(--navy); color: white; }
+
+.mc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mc-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.mc-option:hover { border-color: var(--blue); background: var(--blue-xpale); }
+.mc-option.selected { border-color: var(--blue); background: var(--blue-pale); }
+
+.mc-option-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mc-option.selected .mc-option-letter {
+  background: var(--blue);
+  color: white;
+}
+
+.mc-option-text {
+  font-size: 15px;
+  color: var(--gray-700);
+  line-height: 1.5;
+  padding-top: 2px;
+}
+
+/* ─── RIASEC ─── */
+.riasec-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.riasec-item:last-child { border-bottom: none; }
+
+.riasec-text {
+  font-size: 16px;
+  color: var(--gray-700);
+  margin-bottom: 12px;
+}
+
+.riasec-scale {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.riasec-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 50px;
+}
+
+.riasec-emoji {
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  background: var(--gray-50);
+}
+
+.riasec-option:hover .riasec-emoji { background: var(--blue-pale); border-color: var(--blue); transform: scale(1.1); }
+.riasec-option.selected .riasec-emoji { background: var(--blue-pale); border-color: var(--blue); transform: scale(1.1); }
+
+.riasec-option-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.riasec-option.selected .riasec-option-label { color: var(--blue); }
+
+.riasec-progress-text {
+  font-size: 13px;
+  color: var(--gray-500);
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* ─── TEACHER REPORT ─── */
+.teacher-header {
+  background: linear-gradient(135deg, var(--navy) 0%, #2d5282 100%);
+  color: white;
+  padding: 28px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+
+.teacher-header h2 { font-size: 28px; color: white; margin-bottom: 6px; }
+.teacher-header p { opacity: 0.8; font-size: 15px; }
+
+.student-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 600px) { .student-selector { grid-template-columns: 1fr; } }
+
+.student-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.student-card:hover { border-color: var(--blue); box-shadow: var(--shadow-md); }
+.student-card.selected { border-color: var(--navy); background: var(--blue-xpale); }
+
+.student-card-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.student-card-meta {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+}
+
+.student-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.tag-blue { background: var(--blue-pale); color: var(--blue); }
+.tag-green { background: var(--green-pale); color: var(--green); }
+.tag-amber { background: var(--amber-pale); color: var(--amber); }
+
+/* ─── SCORE BARS ─── */
+.score-section { margin-bottom: 20px; }
+.score-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.score-label { font-size: 14px; font-weight: 700; color: var(--gray-600); }
+.score-value { font-size: 14px; font-weight: 800; color: var(--navy); }
+
+.score-bar-bg {
+  height: 8px;
+  background: var(--gray-100);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.8s ease;
+}
+
+.fill-blue { background: linear-gradient(90deg, var(--blue-mid), var(--blue)); }
+.fill-green { background: linear-gradient(90deg, #34d399, var(--green)); }
+.fill-amber { background: linear-gradient(90deg, #fbbf24, var(--amber)); }
+.fill-red { background: linear-gradient(90deg, #f87171, var(--red)); }
+
+/* ─── REPORT OUTPUT ─── */
+.report-output {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  margin-top: 20px;
+}
+
+.report-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.report-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.report-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--navy);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+.report-body {
+  font-size: 15px;
+  color: var(--gray-700);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.segnalazione-box {
+  background: #fef3c7;
+  border: 2px solid var(--amber);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 15px;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 40px;
+  color: var(--gray-500);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--blue-pale);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── COMPLETION SCREEN ─── */
+.completion-card {
+  text-align: center;
+  padding: 48px 28px;
+}
+
+.completion-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.completion-title {
+  font-size: 32px;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+
+.completion-sub {
+  font-size: 16px;
+  color: var(--gray-500);
+  max-width: 500px;
+  margin: 0 auto 28px;
+}
+
+/* ─── CFT NOTE BOX ─── */
+.note-box {
+  background: var(--blue-xpale);
+  border: 1px solid var(--blue-pale);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--navy);
+  margin-bottom: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.note-icon { flex-shrink: 0; font-size: 16px; }
+
+/* ─── SUBTEST INSTRUCTION ─── */
+.subtest-instruction {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 15px;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* ─── TOPOLOGY ─── */
+.topology-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.topology-reference {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.topology-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-500);
+}
+
+/* ─── INPUTS VALIDATION ─── */
+.invalid {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px var(--red-pale) !important;
+}
+
+.error-msg {
+  font-size: 12px;
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* ─── DEMO NAV BAR ─── */
+.demo-bar {
+  background: #0f172a;
+  border-top: 3px solid #f59e0b;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
+}
+
+.demo-bar-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.demo-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.demo-btn:hover { background: rgba(255,255,255,0.2); }
+.demo-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+.demo-btn.arrow { font-size: 16px; padding: 6px 10px; }
+
+.demo-sep {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+/* ─── FLAG MODAL ─── */
+.flag-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.flag-modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.flag-modal-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.flag-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--gray-100);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── STUDENT CARD FLAG ─── */
+.flag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.15s;
+}
+
+.flag-badge:hover {
+  background: #fde68a;
+  transform: scale(1.03);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .main { padding: 20px 12px 60px; }
+  .card { padding: 20px 16px; }
+  .nav-tab { padding: 14px 12px; font-size: 13px; }
+  .nav-brand { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="disclaimer">
+  🔬 MIRA — Strumento dimostrativo per progetto di ricerca universitaria — non per uso clinico o decisionale reale
+</div>
+
+<nav>
+  <div class="nav-brand"><span style="letter-spacing:2px;">MIRA</span></div>
+  <div class="nav-tab active" data-view="somministrazione" onclick="switchView('somministrazione')">
+    📝 <span>Somministrazione Test</span> <span class="nav-badge badge-student">STUDENTE</span>
+  </div>
+  <div class="nav-tab" data-view="student-report" onclick="switchView('student-report')">
+    📄 <span>Il Tuo Report</span> <span class="nav-badge badge-student">STUDENTE</span>
+  </div>
+  <div class="nav-tab" data-view="teacher" onclick="switchView('teacher')">
+    👩‍🏫 <span>Report Orientativo AI</span> <span class="nav-badge badge-teacher">INSEGNANTE</span>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- SOMMINISTRAZIONE VIEW -->
+  <div class="view active" id="somministrazione">
+    <div class="progress-container">
+      <div class="progress-steps">
+        <div class="step-dot active">
+          <div class="step-circle">1</div>
+          <div class="step-label">Dati</div>
+        </div>
+        <div class="step-dot">
+          <div class="step-circle">2</div>
+          <div class="step-label">CFT</div>
+        </div>
+        <div class="step-dot">
+          <div class="step-circle">3</div>
+          <div class="step-label">Italiano</div>
+        </div>
+        <div class="step-dot">
+          <div class="step-circle">4</div>
+          <div class="step-label">Matematica</div>
+        </div>
+        <div class="step-dot">
+          <div class="step-circle">5</div>
+          <div class="step-label">Interessi</div>
+        </div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="step-container"></div>
+  </div>
+
+  <!-- TEACHER VIEW -->
+  <div class="view" id="teacher">
+    <div id="teacher-container"></div>
+  </div>
+
+  <!-- STUDENT REPORT VIEW -->
+  <div class="view" id="student-report">
+    <div id="student-report-container"></div>
+  </div>
+
+</div>
+
+<!-- DEMO NAV BAR -->
+<div class="demo-bar">
+  <span class="demo-bar-label">⚡ Demo</span>
+  <div class="demo-sep"></div>
+  <button class="demo-btn" id="db-bg" onclick="demoJump('background')">1 · Dati</button>
+  <button class="demo-btn" id="db-cft1" onclick="demoJump('cft1')">2a · Serie</button>
+  <button class="demo-btn" id="db-cft2" onclick="demoJump('cft2')">2b · Classif.</button>
+  <button class="demo-btn" id="db-cft3" onclick="demoJump('cft3')">2c · Matrici</button>
+  <button class="demo-btn" id="db-cft4" onclick="demoJump('cft4')">2d · Topologia</button>
+  <button class="demo-btn" id="db-it" onclick="demoJump('italiano')">3 · Italiano</button>
+  <button class="demo-btn" id="db-math" onclick="demoJump('matematica')">4 · Matematica</button>
+  <button class="demo-btn" id="db-mag1" onclick="demoJump('mag1')">5a · ❤️ Interessi</button>
+  <button class="demo-btn" id="db-mag2" onclick="demoJump('mag2')">5b · 💪 Autoefficacia</button>
+  <button class="demo-btn" id="db-mag3" onclick="demoJump('mag3')">5c · 🔮 Propensione</button>
+  <button class="demo-btn" id="db-done" onclick="demoJump('done')">6 · Fine test</button>
+  <div class="demo-sep"></div>
+  <button class="demo-btn" id="db-teacher" onclick="demoJump('teacher')">👩‍🏫 Report AI</button>
+  <button class="demo-btn" id="db-student-report" onclick="demoJump('student-report')">📄 Report Studente</button>
+</div>
+
+<!-- FLAG MODAL -->
+<div class="flag-modal-overlay" id="flag-modal-overlay" style="display:none;" onclick="closeFlagModal(event)">
+  <div class="flag-modal" id="flag-modal">
+    <button class="flag-modal-close" onclick="closeFlagModal()">✕</button>
+    <div class="flag-modal-title" id="flag-modal-title"></div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px;" id="flag-modal-subtitle"></div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;" id="flag-modal-tracks"></div>
+    <div style="font-size:15px;color:var(--gray-700);line-height:1.7;margin-bottom:24px;" id="flag-modal-body"></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;" id="flag-modal-actions">
+      <button onclick="resolveFlag('confirm')" style="flex:1;min-width:160px;padding:14px 18px;background:white;border:2px solid #dc2626;color:#dc2626;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+        ✋ Confermo la mia decisione
+      </button>
+      <button onclick="resolveFlag('revise')" style="flex:1;min-width:160px;padding:14px 18px;background:#059669;border:2px solid #059669;color:white;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#059669'">
+        🔄 Rivedo la mia decisione
+      </button>
+    </div>
+    <div id="flag-modal-outcome" style="display:none;margin-top:16px;padding:14px;border-radius:8px;font-size:14px;font-weight:600;"></div>
+  </div>
+</div>
+
+<script>
+// ─── SVG PRIMITIVES ───
+function svgWrap(content, w=80, h=80, dashed=false) {
+  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"
+    style="display:block;${dashed?'border:2px dashed #93c5fd;border-radius:6px;':''}">${content}</svg>`;
+}
+const R = (x,y,w,h,fill='#1e293b',rot=0) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${rot?`transform="rotate(${rot},${x+w/2},${y+h/2})"`:''}/>`;
+const C = (cx,cy,r,fill='#1e293b',stroke='none',sw=2) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+const T = (cx,cy,s,fill='#1e293b',rot=0) => {
+  const h = s*Math.sqrt(3)/2;
+  return `<polygon points="${cx},${cy-h*2/3} ${cx-s/2},${cy+h/3} ${cx+s/2},${cy+h/3}" fill="${fill}" ${rot?`transform="rotate(${rot},${cx},${cy})"`:''}/>`;
+};
+const L = (x1,y1,x2,y2,s='#1e293b',w=2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${s}" stroke-width="${w}" stroke-linecap="round"/>`;
+const SQ = (cx,cy,s,fill='#1e293b',stroke='none',sw=2,rot=0) => {
+  const h = s/2;
+  return `<rect x="${cx-h}" y="${cy-h}" width="${s}" height="${s}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" ${rot?`transform="rotate(${rot},${cx},${cy})"`:''}/>`;
+};
+const DOT = (cx,cy,r=5,fill='#1e293b') => C(cx,cy,r,fill);
+const CIRC_OUTLINE = (cx,cy,r,stroke='#1e293b',sw=2.5) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+const SQ_OUTLINE = (cx,cy,s,stroke='#1e293b',sw=2.5,rot=0) => `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" fill="none" stroke="${stroke}" stroke-width="${sw}" ${rot?`transform="rotate(${rot},${cx},${cy})"`:''}/>`;
+
+// Generate svg with background
+const bg = (content) => `<rect x="0" y="0" width="80" height="80" fill="white"/>${content}`;
+
+// ─── CFT SERIES ITEMS ───
+// Each item: { seq: [svg,...], missingIdx:3, choices: [{svg,correct},...] }
+const CFT_SERIES = [
+  // Q1: rectangles growing wider
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(R(28,28,24,24))),
+      svgWrap(bg(R(20,28,40,24))),
+      svgWrap(bg(R(14,28,52,24))),
+    ],
+    choices: [
+      { svg: svgWrap(bg(R(6,28,68,24))), correct: true },   // A: very wide - CORRECT
+      { svg: svgWrap(bg(R(20,28,40,24))), correct: false },  // B: same as pos2
+      { svg: svgWrap(bg(R(28,28,24,24))), correct: false },  // C: small
+      { svg: svgWrap(bg(R(14,28,52,30))), correct: false },  // D: taller
+      { svg: svgWrap(bg(R(20,20,40,40))), correct: false },  // E: square-ish
+    ],
+    correct: 0
+  },
+  // Q2: number of circles growing
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(C(40,40,12))),
+      svgWrap(bg(C(25,40,12)+C(55,40,12))),
+      svgWrap(bg(C(18,40,11)+C(40,40,11)+C(62,40,11))),
+    ],
+    choices: [
+      { svg: svgWrap(bg(C(15,40,10)+C(35,40,10)+C(55,40,10)+C(73,40,10))), correct: true }, // A: 4 circles CORRECT
+      { svg: svgWrap(bg(C(18,40,11)+C(40,40,11)+C(62,40,11))), correct: false }, // B: 3
+      { svg: svgWrap(bg(C(40,40,20))), correct: false }, // C: 1 big
+      { svg: svgWrap(bg(C(25,28,10)+C(55,28,10)+C(25,52,10)+C(55,52,10))), correct: false }, // D: 4 in grid
+      { svg: svgWrap(bg(C(20,40,10)+C(40,40,10)+C(60,40,10)+C(40,60,10)+C(40,20,10))), correct: false }, // E: 5
+    ],
+    correct: 0
+  },
+  // Q3: triangles rotating 60° each step
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(T(40,40,36,))), // pointing up
+      svgWrap(bg(T(40,40,36,'#1e293b',60))), // rotated 60
+      svgWrap(bg(T(40,40,36,'#1e293b',120))), // rotated 120
+    ],
+    choices: [
+      { svg: svgWrap(bg(T(40,40,36,'#1e293b',180))), correct: true }, // A: pointing down CORRECT
+      { svg: svgWrap(bg(T(40,40,36,'#1e293b',90))), correct: false }, // B: 90
+      { svg: svgWrap(bg(T(40,40,36))), correct: false }, // C: up again
+      { svg: svgWrap(bg(T(40,40,36,'#1e293b',45))), correct: false }, // D: 45
+      { svg: svgWrap(bg(C(40,40,18))), correct: false }, // E: circle
+    ],
+    correct: 0
+  },
+  // Q4: square with growing number of inner squares (nested)
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(SQ_OUTLINE(40,40,60))),
+      svgWrap(bg(SQ_OUTLINE(40,40,60)+SQ_OUTLINE(40,40,40))),
+      svgWrap(bg(SQ_OUTLINE(40,40,60)+SQ_OUTLINE(40,40,40)+SQ_OUTLINE(40,40,20))),
+    ],
+    choices: [
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+SQ_OUTLINE(40,40,44)+SQ_OUTLINE(40,40,28)+SQ_OUTLINE(40,40,12))), correct: true }, // A: 4 CORRECT
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+SQ_OUTLINE(40,40,40))), correct: false }, // B: 2
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60))), correct: false }, // C: 1
+      { svg: svgWrap(bg(SQ(40,40,60))), correct: false }, // D: filled
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30))), correct: false }, // E: circle
+    ],
+    correct: 0
+  },
+  // Q5: dot moving clockwise (TL → TR → BR → ?)
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(16,16))), // TL
+      svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(64,16))), // TR
+      svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(64,64))), // BR
+    ],
+    choices: [
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(16,64))), correct: true }, // A: BL CORRECT
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(16,16))), correct: false }, // B: TL
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(40,40))), correct: false }, // C: center
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(64,16))), correct: false }, // D: TR
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,60)+DOT(64,64))), correct: false }, // E: BR
+    ],
+    correct: 0
+  },
+  // Q6: alternating fill pattern (filled, empty, filled, ?)
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(C(40,40,22))), // filled
+      svgWrap(bg(CIRC_OUTLINE(40,40,22))), // empty
+      svgWrap(bg(C(40,40,22))), // filled
+    ],
+    choices: [
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,22))), correct: true }, // A: empty CORRECT
+      { svg: svgWrap(bg(C(40,40,22))), correct: false }, // B: filled
+      { svg: svgWrap(bg(C(40,40,22,'#94a3b8'))), correct: false }, // C: gray
+      { svg: svgWrap(bg(SQ(40,40,44))), correct: false }, // D: square
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,32))), correct: false }, // E: bigger circle
+    ],
+    correct: 0
+  },
+  // Q7: shapes getting smaller
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(SQ(40,40,56))),
+      svgWrap(bg(SQ(40,40,40))),
+      svgWrap(bg(SQ(40,40,26))),
+    ],
+    choices: [
+      { svg: svgWrap(bg(SQ(40,40,14))), correct: true }, // A: tiny CORRECT
+      { svg: svgWrap(bg(SQ(40,40,26))), correct: false }, // B: same size
+      { svg: svgWrap(bg(SQ(40,40,40))), correct: false }, // C: getting bigger
+      { svg: svgWrap(bg(SQ(40,40,56))), correct: false }, // D: largest
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,14))), correct: false }, // E: tiny outline
+    ],
+    correct: 0
+  },
+  // Q8: lines crossing (1 → 2 → 3 → ?)
+  {
+    question: "Quale figura completa la serie?",
+    seq: [
+      svgWrap(bg(L(40,10,40,70))), // 1 vertical
+      svgWrap(bg(L(40,10,40,70)+L(10,40,70,40))), // + cross
+      svgWrap(bg(L(40,10,40,70)+L(10,40,70,40)+L(17,17,63,63))), // + diagonal
+    ],
+    choices: [
+      { svg: svgWrap(bg(L(40,10,40,70)+L(10,40,70,40)+L(17,17,63,63)+L(63,17,17,63))), correct: true }, // A: 4 lines CORRECT
+      { svg: svgWrap(bg(L(40,10,40,70)+L(10,40,70,40))), correct: false }, // B: 2 lines
+      { svg: svgWrap(bg(L(40,10,40,70))), correct: false }, // C: 1 line
+      { svg: svgWrap(bg(L(40,10,40,70)+L(10,40,70,40)+L(17,17,63,63)+L(63,17,17,63)+L(10,25,70,55))), correct: false }, // D: 5 lines
+      { svg: svgWrap(bg(L(17,17,63,63)+L(63,17,17,63))), correct: false }, // E: only diagonals
+    ],
+    correct: 0
+  }
+];
+
+// ─── CFT CLASSIFICAZIONI ───
+// Find the odd one out among 5 shapes
+const CFT_CLASSIF = [
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(SQ(40,40,44))),    // square
+      svgWrap(bg(SQ(40,40,44))),    // square
+      svgWrap(bg(SQ(40,40,44))),    // square
+      svgWrap(bg(T(40,40,44))),     // TRIANGLE - odd
+      svgWrap(bg(SQ(40,40,44))),    // square
+    ],
+    correct: 3
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(C(40,40,22))),             // filled
+      svgWrap(bg(C(40,40,22))),             // filled
+      svgWrap(bg(CIRC_OUTLINE(40,40,22))),  // OUTLINE - odd
+      svgWrap(bg(C(40,40,22))),             // filled
+      svgWrap(bg(C(40,40,22))),             // filled
+    ],
+    correct: 2
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(SQ(40,40,50))),    // big
+      svgWrap(bg(SQ(40,40,50))),    // big
+      svgWrap(bg(SQ(40,40,50))),    // big
+      svgWrap(bg(SQ(40,40,50))),    // big
+      svgWrap(bg(SQ(40,40,22))),    // SMALL - odd
+    ],
+    correct: 4
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(R(14,32,52,16))),  // horizontal rect
+      svgWrap(bg(R(14,32,52,16))),
+      svgWrap(bg(R(14,32,52,16))),
+      svgWrap(bg(R(32,14,16,52))),  // VERTICAL - odd
+      svgWrap(bg(R(14,32,52,16))),
+    ],
+    correct: 3
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(SQ_OUTLINE(40,40,48))),    // square outline
+      svgWrap(bg(SQ_OUTLINE(40,40,48))),
+      svgWrap(bg(CIRC_OUTLINE(40,40,24))),  // CIRCLE - odd
+      svgWrap(bg(SQ_OUTLINE(40,40,48))),
+      svgWrap(bg(SQ_OUTLINE(40,40,48))),
+    ],
+    correct: 2
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(DOT(25,40,7)+DOT(40,40,7)+DOT(55,40,7))),  // 3 dots
+      svgWrap(bg(DOT(25,40,7)+DOT(40,40,7)+DOT(55,40,7))),
+      svgWrap(bg(DOT(25,40,7)+DOT(40,40,7)+DOT(55,40,7))),
+      svgWrap(bg(DOT(30,40,7)+DOT(50,40,7))),                // 2 DOTS - odd
+      svgWrap(bg(DOT(25,40,7)+DOT(40,40,7)+DOT(55,40,7))),
+    ],
+    correct: 3
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(SQ(40,40,40))),
+      svgWrap(bg(SQ(40,40,40))),
+      svgWrap(bg(SQ(40,40,40,'#94a3b8'))),  // GRAY - odd
+      svgWrap(bg(SQ(40,40,40))),
+      svgWrap(bg(SQ(40,40,40))),
+    ],
+    correct: 2
+  },
+  {
+    question: "Quale figura è diversa dalle altre?",
+    items: [
+      svgWrap(bg(SQ(40,40,40)+SQ(40,40,24,'white'))),   // hollow (border effect)
+      svgWrap(bg(SQ(40,40,40)+SQ(40,40,24,'white'))),
+      svgWrap(bg(SQ(40,40,40)+SQ(40,40,24,'white'))),
+      svgWrap(bg(SQ(40,40,40))),                          // FULLY FILLED - odd
+      svgWrap(bg(SQ(40,40,40)+SQ(40,40,24,'white'))),
+    ],
+    correct: 3
+  }
+];
+
+// ─── CFT MATRICI ───
+// 3x3 grid, bottom-right missing. 5 choices.
+// Patterns: row/col rules
+const CFT_MATRICI = [
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: number of dots increases by column (1,2,3), rows same
+    grid: [
+      svgWrap(bg(DOT(40,40,9))), svgWrap(bg(DOT(28,40,9)+DOT(52,40,9))), svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))),
+      svgWrap(bg(DOT(40,40,9))), svgWrap(bg(DOT(28,40,9)+DOT(52,40,9))), svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))),
+      svgWrap(bg(DOT(40,40,9))), svgWrap(bg(DOT(28,40,9)+DOT(52,40,9))), null  // MISSING
+    ],
+    choices: [
+      { svg: svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))), correct: true },
+      { svg: svgWrap(bg(DOT(40,40,9))), correct: false },
+      { svg: svgWrap(bg(DOT(28,40,9)+DOT(52,40,9))), correct: false },
+      { svg: svgWrap(bg(DOT(22,30,9)+DOT(40,30,9)+DOT(58,30,9)+DOT(40,52,9))), correct: false },
+      { svg: svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9)+DOT(40,22,9))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: shape gets filled by column: outline→half→full
+    grid: [
+      svgWrap(bg(SQ_OUTLINE(40,40,44))), svgWrap(bg(SQ_OUTLINE(40,40,44)+R(18,18,44,22,'#1e293b'))), svgWrap(bg(SQ(40,40,44))),
+      svgWrap(bg(CIRC_OUTLINE(40,40,22))), svgWrap(bg(CIRC_OUTLINE(40,40,22)+`<path d="M40,18 A22,22 0 0,1 62,40 L40,40 Z" fill="#1e293b"/>`)), svgWrap(bg(C(40,40,22))),
+      svgWrap(bg(T(40,44,44,'none')+`<polygon points="40,12 18,56 62,56" fill="none" stroke="#1e293b" stroke-width="2.5"/>`)), 
+      svgWrap(bg(T(40,44,44,'none')+`<polygon points="40,12 18,56 62,56" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+`<polygon points="40,12 29,34 51,34" fill="#1e293b"/>`)), 
+      null  // filled triangle
+    ],
+    choices: [
+      { svg: svgWrap(bg(T(40,44,44))), correct: true },
+      { svg: svgWrap(bg(T(40,44,44,'none')+`<polygon points="40,12 18,56 62,56" fill="none" stroke="#1e293b" stroke-width="2.5"/>`)), correct: false },
+      { svg: svgWrap(bg(SQ(40,40,44))), correct: false },
+      { svg: svgWrap(bg(C(40,40,22))), correct: false },
+      { svg: svgWrap(bg(T(40,44,44,'#94a3b8'))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: size decreases each row, shape same in column
+    grid: [
+      svgWrap(bg(SQ(40,40,54))), svgWrap(bg(C(40,40,27))), svgWrap(bg(T(40,42,54))),
+      svgWrap(bg(SQ(40,40,38))), svgWrap(bg(C(40,40,19))), svgWrap(bg(T(40,42,38))),
+      svgWrap(bg(SQ(40,40,22))), svgWrap(bg(C(40,40,11))), null
+    ],
+    choices: [
+      { svg: svgWrap(bg(T(40,42,22))), correct: true },
+      { svg: svgWrap(bg(T(40,42,38))), correct: false },
+      { svg: svgWrap(bg(T(40,42,54))), correct: false },
+      { svg: svgWrap(bg(C(40,40,11))), correct: false },
+      { svg: svgWrap(bg(SQ(40,40,22))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: rotation increases by 45° left to right
+    grid: [
+      svgWrap(bg(SQ_OUTLINE(40,40,44,undefined,undefined,0))), svgWrap(bg(SQ_OUTLINE(40,40,44,undefined,undefined,22.5))), svgWrap(bg(SQ_OUTLINE(40,40,44,undefined,undefined,45))),
+      svgWrap(bg(SQ(40,40,44,'none')+`<rect x="18" y="18" width="44" height="44" fill="#1e293b" transform="rotate(0,40,40)"/>`)),
+      svgWrap(bg(`<rect x="18" y="18" width="44" height="44" fill="#1e293b" transform="rotate(22.5,40,40)"/>`)),
+      svgWrap(bg(`<rect x="18" y="18" width="44" height="44" fill="#1e293b" transform="rotate(45,40,40)"/>`)),
+      svgWrap(bg(R(24,24,32,32)+L(24,24,56,56)+L(56,24,24,56))),
+      svgWrap(bg(R(24,24,32,32,'none')+`<rect x="24" y="24" width="32" height="32" fill="#1e293b" transform="rotate(22.5,40,40)"/>`+L(29,29,51,51)+L(51,29,29,51))),
+      null
+    ],
+    choices: [
+      { svg: svgWrap(bg(`<rect x="24" y="24" width="32" height="32" fill="#1e293b" transform="rotate(45,40,40)"/>`+L(40,12,40,68)+L(12,40,68,40))), correct: true },
+      { svg: svgWrap(bg(R(24,24,32,32)+L(24,24,56,56)+L(56,24,24,56))), correct: false },
+      { svg: svgWrap(bg(SQ(40,40,32))), correct: false },
+      { svg: svgWrap(bg(L(40,12,40,68)+L(12,40,68,40)+L(18,18,62,62)+L(62,18,18,62))), correct: false },
+      { svg: svgWrap(bg(C(40,40,20))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: fill color alternates by diagonal
+    grid: [
+      svgWrap(bg(SQ(40,40,44))), svgWrap(bg(SQ(40,40,44,'#94a3b8'))), svgWrap(bg(SQ_OUTLINE(40,40,44))),
+      svgWrap(bg(SQ(40,40,44,'#94a3b8'))), svgWrap(bg(SQ_OUTLINE(40,40,44))), svgWrap(bg(SQ(40,40,44))),
+      svgWrap(bg(SQ_OUTLINE(40,40,44))), svgWrap(bg(SQ(40,40,44))), null
+    ],
+    choices: [
+      { svg: svgWrap(bg(SQ(40,40,44,'#94a3b8'))), correct: true },
+      { svg: svgWrap(bg(SQ(40,40,44))), correct: false },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,44))), correct: false },
+      { svg: svgWrap(bg(C(40,40,22,'#94a3b8'))), correct: false },
+      { svg: svgWrap(bg(SQ(40,40,22,'#94a3b8'))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: each row has circle, square, triangle in different orders
+    grid: [
+      svgWrap(bg(C(40,40,20))), svgWrap(bg(SQ(40,40,40))), svgWrap(bg(T(40,42,40))),
+      svgWrap(bg(SQ(40,40,40))), svgWrap(bg(T(40,42,40))), svgWrap(bg(C(40,40,20))),
+      svgWrap(bg(T(40,42,40))), svgWrap(bg(C(40,40,20))), null
+    ],
+    choices: [
+      { svg: svgWrap(bg(SQ(40,40,40))), correct: true },
+      { svg: svgWrap(bg(C(40,40,20))), correct: false },
+      { svg: svgWrap(bg(T(40,42,40))), correct: false },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,40))), correct: false },
+      { svg: svgWrap(bg(SQ(40,40,30))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: number of elements increases along diagonal
+    grid: [
+      svgWrap(bg(DOT(40,40,12))), svgWrap(bg(DOT(28,40,10)+DOT(52,40,10))), svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))),
+      svgWrap(bg(DOT(28,40,10)+DOT(52,40,10))), svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))), svgWrap(bg(DOT(18,40,8)+DOT(31,40,8)+DOT(44,40,8)+DOT(57,40,8))),
+      svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))), svgWrap(bg(DOT(18,40,8)+DOT(31,40,8)+DOT(44,40,8)+DOT(57,40,8))), null
+    ],
+    choices: [
+      { svg: svgWrap(bg(DOT(16,40,7)+DOT(27,40,7)+DOT(38,40,7)+DOT(49,40,7)+DOT(60,40,7))), correct: true },
+      { svg: svgWrap(bg(DOT(18,40,8)+DOT(31,40,8)+DOT(44,40,8)+DOT(57,40,8))), correct: false },
+      { svg: svgWrap(bg(DOT(22,40,9)+DOT(40,40,9)+DOT(58,40,9))), correct: false },
+      { svg: svgWrap(bg(DOT(15,35,7)+DOT(27,35,7)+DOT(39,35,7)+DOT(51,35,7)+DOT(63,35,7)+DOT(21,50,7))), correct: false },
+      { svg: svgWrap(bg(DOT(40,40,12))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Quale figura completa la matrice?",
+    // Pattern: shapes arranged by outline thickness
+    grid: [
+      svgWrap(bg(CIRC_OUTLINE(40,40,24,'#1e293b',1))), svgWrap(bg(CIRC_OUTLINE(40,40,24,'#1e293b',3))), svgWrap(bg(CIRC_OUTLINE(40,40,24,'#1e293b',5))),
+      svgWrap(bg(SQ_OUTLINE(40,40,48,'#1e293b',1))), svgWrap(bg(SQ_OUTLINE(40,40,48,'#1e293b',3))), svgWrap(bg(SQ_OUTLINE(40,40,48,'#1e293b',5))),
+      svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="none" stroke="#1e293b" stroke-width="1"/>`)),
+      svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="none" stroke="#1e293b" stroke-width="3"/>`)),
+      null
+    ],
+    choices: [
+      { svg: svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="none" stroke="#1e293b" stroke-width="5"/>`)), correct: true },
+      { svg: svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="#1e293b"/>`)), correct: false },
+      { svg: svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="none" stroke="#1e293b" stroke-width="3"/>`)), correct: false },
+      { svg: svgWrap(bg(`<polygon points="40,10 68,62 12,62" fill="none" stroke="#94a3b8" stroke-width="5"/>`)), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,24,'#1e293b',5))), correct: false },
+    ],
+    correct: 0
+  }
+];
+
+// ─── CFT TOPOLOGIA ───
+// Reference shape + dot → transformed shape → where is dot?
+const CFT_TOPOLOGIA = [
+  {
+    question: "Il punto nella figura di sinistra si trova DENTRO al cerchio e FUORI dal quadrato. In quale figura a destra il punto mantiene questa posizione?",
+    ref: svgWrap(bg(SQ_OUTLINE(40,40,48)+CIRC_OUTLINE(40,40,30)+DOT(54,30,5,'#dc2626')), 80, 80),
+    // dot is inside circle (radius 30) but outside square (48px). Actually dot at (54,30): dist from center = sqrt(14²+10²)=~17 < 30 ✓ (inside circle); and 54>16+40=needs checking... actually square is 48 wide so left edge=16, right edge=64; top=16 bottom=64. 54,30 is inside square. Hmm. Let me redo: dot at (63,30): dist from center = sqrt(23²+10²) = ~25 < 30 (inside circle); x=63 > right edge of square at 64... close. Actually: SQ_OUTLINE(40,40,48) means center (40,40), size 48, so edges at 16,64. DOT(66,30): outside square (66>64) but inside circle? dist = sqrt(26²+10²)=~28 < 30. Yes!
+    ref: svgWrap(bg(SQ_OUTLINE(40,40,48)+CIRC_OUTLINE(40,40,30)+DOT(65,30,5,'#dc2626')), 80, 80),
+    choices: [
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30)+SQ_OUTLINE(40,40,48)+DOT(65,50,5,'#dc2626'))), correct: false }, // dot inside square AND circle
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30)+SQ_OUTLINE(40,40,48)+DOT(65,30,5,'#dc2626'))), correct: true }, // inside circle, outside square CORRECT
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30)+SQ_OUTLINE(40,40,48)+DOT(40,70,5,'#dc2626'))), correct: false }, // outside both
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30)+SQ_OUTLINE(40,40,48)+DOT(40,40,5,'#dc2626'))), correct: false }, // center (both)
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,30)+SQ_OUTLINE(40,40,48)+DOT(30,30,5,'#dc2626'))), correct: false }, // inside both
+    ],
+    correct: 1
+  },
+  {
+    question: "Il punto si trova DENTRO al quadrato. In quale figura il punto rimane dentro al quadrato dopo la rotazione?",
+    ref: svgWrap(bg(SQ_OUTLINE(40,40,46)+DOT(40,40,5,'#dc2626')), 80, 80),
+    choices: [
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,46,'#1e293b',2.5,45)+DOT(40,40,5,'#dc2626'))), correct: true },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,46,'#1e293b',2.5,45)+DOT(40,10,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,46,'#1e293b',2.5,45)+DOT(5,40,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,46,'#1e293b',2.5,45)+DOT(68,68,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,46,'#1e293b',2.5,45)+DOT(75,40,5,'#dc2626'))), correct: false },
+    ],
+    correct: 0
+  },
+  {
+    question: "Il punto si trova FUORI da entrambe le figure. Quale risposta mantiene il punto fuori da entrambe le figure?",
+    ref: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(70,40,5,'#dc2626')), 80, 80),
+    choices: [
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(40,40,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(40,28,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(70,40,5,'#dc2626'))), correct: true },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(32,40,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,20)+SQ_OUTLINE(40,40,36)+DOT(22,40,5,'#dc2626'))), correct: false },
+    ],
+    correct: 2
+  },
+  {
+    question: "Il punto si trova DENTRO al cerchio. Quale risposta mantiene il punto dentro al cerchio?",
+    ref: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(40,30,5,'#dc2626')), 80, 80),
+    choices: [
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(70,40,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(40,40,5,'#dc2626'))), correct: true },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(40,72,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(10,10,5,'#dc2626'))), correct: false },
+      { svg: svgWrap(bg(CIRC_OUTLINE(40,40,28)+DOT(70,70,5,'#dc2626'))), correct: false },
+    ],
+    correct: 1
+  },
+  {
+    question: "Il punto è sul bordo del quadrato. Quale risposta mostra il punto sul bordo?",
+    ref: svgWrap(bg(SQ_OUTLINE(40,40,50)+DOT(65,40,5,'#dc2626')), 80, 80), // dot on right edge
+    choices: [
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,50,'#1e293b',2.5,45)+DOT(40,12,5,'#dc2626'))), correct: true }, // rotated, dot on top vertex
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,50,'#1e293b',2.5,45)+DOT(40,40,5,'#dc2626'))), correct: false }, // center
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,50,'#1e293b',2.5,45)+DOT(70,40,5,'#dc2626'))), correct: false }, // outside
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,50,'#1e293b',2.5,45)+DOT(32,32,5,'#dc2626'))), correct: false }, // inside
+      { svg: svgWrap(bg(SQ_OUTLINE(40,40,50,'#1e293b',2.5,45)+DOT(10,70,5,'#dc2626'))), correct: false }, // far outside
+    ],
+    correct: 0
+  },
+  {
+    question: "Il punto è dentro al triangolo. In quale figura il punto rimane dentro al triangolo?",
+    ref: svgWrap(bg(`<polygon points="40,10 70,65 10,65" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(40,45,5,'#dc2626')), 80, 80),
+    choices: [
+      { svg: svgWrap(bg(`<polygon points="40,70 70,15 10,15" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(40,35,5,'#dc2626'))), correct: true }, // flipped, dot inside
+      { svg: svgWrap(bg(`<polygon points="40,70 70,15 10,15" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(40,5,5,'#dc2626'))), correct: false }, // outside
+      { svg: svgWrap(bg(`<polygon points="40,70 70,15 10,15" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(75,40,5,'#dc2626'))), correct: false }, // outside
+      { svg: svgWrap(bg(`<polygon points="40,70 70,15 10,15" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(40,75,5,'#dc2626'))), correct: false }, // outside
+      { svg: svgWrap(bg(`<polygon points="40,70 70,15 10,15" fill="none" stroke="#1e293b" stroke-width="2.5"/>`+DOT(8,8,5,'#dc2626'))), correct: false }, // outside
+    ],
+    correct: 0
+  }
+];
+
+// ─── INVALSI ITALIANO ───
+const INVALSI_ITALIANO_TEXT = `Il lupo è un animale sociale che vive in branchi organizzati gerarchicamente. Il branco è guidato dalla coppia alfa, composta da un maschio e una femmina dominanti. Ogni membro del branco ha un ruolo preciso: i lupi beta supportano la coppia alfa, mentre gli omega occupano la posizione più bassa nella gerarchia. La comunicazione tra i lupi avviene tramite vocalizzi, posture corporee e segnali olfattivi. L'ululato, il segnale più iconico, serve per riunire il branco, segnalare la presenza del gruppo ad altri branchi e rafforzare i legami sociali. I lupi cacciano in cooperazione, strategia che consente loro di abbattere prede molto più grandi di loro, come cervi ed alci.`;
+
+const INVALSI_ITALIANO_Qs = [
+  // MA1 - trovare informazione esplicita
+  { tag:'MA1', text:'Chi guida il branco di lupi, secondo il testo?', options:['Il lupo omega','La coppia alfa, composta da maschio e femmina dominanti','Il lupo beta maschio','Il lupo più anziano del branco'], correct:1 },
+  { tag:'MA1', text:'Quali metodi di comunicazione vengono citati nel testo?', options:['Graffi e morsi','Solo l\'ululato','Vocalizzi, posture corporee e segnali olfattivi','Colori del pelo e profumi'], correct:2 },
+  { tag:'MA1', text:'Quali prede vengono esplicitamente menzionate nel testo?', options:['Capre e pecore','Cinghiali e daini','Cervi ed alci','Lepri e conigli'], correct:2 },
+  // MA2 - ricostruire il significato
+  { tag:'MA2', text:'Perché i lupi cacciano in cooperazione, secondo il testo?', options:['Perché non sanno cacciare da soli','Perché è una regola del branco imposta dall\'alfa','Perché così possono abbattere prede molto più grandi di loro','Perché la cooperazione li rende più veloci nella corsa'], correct:2 },
+  { tag:'MA2', text:'Che cosa significa che il branco è "organizzato gerarchicamente"?', options:['Che i lupi abitano in zone di montagna','Che ogni membro ha un ruolo e una posizione precisi','Che il branco si sposta seguendo un percorso fisso','Che i lupi comunicano tra loro di notte'], correct:1 },
+  { tag:'MA2', text:'Quale funzione ha l\'ululato secondo il testo?', options:['Soltanto segnalare il pericolo ai cuccioli','Riunire il branco, segnalare la presenza ad altri branchi e rafforzare i legami sociali','Indicare la presenza di prede nelle vicinanze','Stabilire chi è il lupo alfa del branco'], correct:1 },
+  // MA3 - riflessione su forma e contenuto
+  { tag:'MA3', text:'Che tipo di testo è questo?', options:['Un racconto di fantasia','Un testo informativo/scientifico','Una lettera personale','Un testo pubblicitario'], correct:1 },
+  { tag:'MA3', text:'Quale affermazione NON è supportata dal testo?', options:['I lupi vivono in gruppi organizzati','I lupi comunicano tramite l\'ululato','I lupi difendono il loro territorio dagli umani','I lupi possono abbattere prede grandi come cervi'], correct:2 },
+  { tag:'MA3', text:'Qual è lo scopo principale di questo testo?', options:['Convincere il lettore a proteggere i lupi','Narrare un episodio di caccia dal punto di vista di un lupo','Informare il lettore sul comportamento sociale dei lupi','Descrivere la differenza tra lupi e altri predatori'], correct:2 },
+  // LESSICO
+  { tag:'LESSICO', text:'Nel testo, "gerarchicamente" significa:', options:['In modo caotico e disorganizzato','In modo segreto e nascosto','In modo organizzato per gradi di importanza e ruolo','In modo amichevole e cooperativo'], correct:2 },
+  { tag:'LESSICO', text:'Nel testo, "olfattivi" si riferisce a segnali legati a:', options:['La vista','L\'udito','Il tatto','L\'odorato'], correct:3 },
+  { tag:'LESSICO', text:'Nel testo, "abbattere" significa:', options:['Inseguire per lunghe distanze','Catturare e uccidere','Spaventare per farle fuggire','Osservare da lontano'], correct:1 },
+  // GRAMMATICA
+  { tag:'GRAMMATICA', text:'"Il branco è guidato dalla coppia alfa." In questa frase, qual è il soggetto?', options:['La coppia alfa','Guidato','È','Il branco'], correct:3 },
+  { tag:'GRAMMATICA', text:'"Il branco è guidato dalla coppia alfa." Il verbo "è guidato" è in forma:', options:['Attiva','Passiva','Riflessiva','Impersonale'], correct:1 },
+  { tag:'GRAMMATICA', text:'"...prede molto più grandi di loro..." — questa struttura esprime un comparativo di:', options:['Uguaglianza','Minoranza','Maggioranza','Superlativo'], correct:2 },
+];
+
+// ─── INVALSI MATEMATICA ───
+const INVALSI_MATH_Qs = [
+  // NUMERI
+  { tag:'NUMERI', dim:'CONOSCERE', text:'Francesco esegue nell\'ordine: scrive il numero 5, lo raddoppia, aggiunge 6, divide per 2, sottrae 5. Quale espressione traduce correttamente la sequenza?', options:['(5·2+6):2−5','5·2+6:2−5','5+10+6:2−5','5·2+6:(2−5)'], correct:0 },
+  { tag:'NUMERI', dim:'PROBLEM_SOLVING', text:'Una Music-Card da 60 canzoni costa 3 euro. Qual è il costo di ogni singola canzone?', options:['0,10 euro','0,05 euro','0,20 euro','0,50 euro'], correct:1 },
+  { tag:'NUMERI', dim:'CONOSCERE', text:'In quale sequenza i numeri sono scritti dal più grande al più piccolo?', options:['2; 5; 4; 8','2; 4; 8; 5','8; 5; 4; 2','2; 4; 5; 8'], correct:2 },
+  { tag:'NUMERI', dim:'ARGOMENTARE', text:'Un vasetto di yogurt è composto per il 90% da yogurt bianco e per il 10% da marmellata. La marmellata contiene il 60% di frutta. Qual è la percentuale di frutta nel vasetto?', options:['10%','60%','6%','54%'], correct:2 },
+  { tag:'NUMERI', dim:'PROBLEM_SOLVING', text:'"Se n è un numero pari, allora n+1 è un numero primo." Questa affermazione è:',
+    options:['Vera, perché se n è pari n+1 è sempre dispari e quindi primo',
+             'Falsa, perché per esempio n=8 dà n+1=9=3×3 che non è primo',
+             'Vera, perché tutti i numeri dispari sono primi',
+             'Falsa, perché n+1 non è mai primo'], correct:1 },
+  // SPAZIO E FIGURE
+  { tag:'SPAZIO_FIGURE', dim:'CONOSCERE', text:'Tre cubi uguali di spigolo a vengono incollati per formare un parallelepipedo. Qual è la superficie totale del parallelepipedo?', options:['6a²','7a²','14a²','18a²'], correct:2 },
+  { tag:'SPAZIO_FIGURE', dim:'PROBLEM_SOLVING', text:'L\'area del triangolo grigio A misura 8 m². Il triangolo è metà di un quadrato (triangolo rettangolo con i due cateti uguali al lato del quadrato). Quanto misura il perimetro del quadrato?', options:['8 m','16 m','32 m','4 m'], correct:1 },
+  { tag:'SPAZIO_FIGURE', dim:'ARGOMENTARE', text:'Un cuneo di legno ha base b=12 cm, ipotenusa c=13 cm e profondità d=10 cm. Qual è l\'area della superficie inclinata (faccia con l\'ipotenusa)?', options:['60 cm²','120 cm²','130 cm²','65 cm²'], correct:2 },
+  { tag:'SPAZIO_FIGURE', dim:'CONOSCERE', text:'Secondo il modello delle proporzioni di Leonardo da Vinci, la lunghezza della mano è 1/10 dell\'altezza. Se Lucia è alta 150 cm, quanto dovrebbe essere lunga la sua mano secondo questo modello?', options:['10 cm','15 cm','18 cm','20 cm'], correct:1 },
+  { tag:'SPAZIO_FIGURE', dim:'PROBLEM_SOLVING', text:'Due circonferenze di uguale raggio sono posizionate simmetricamente. La retta di simmetria che le separa passa:', options:['Per il centro di una sola circonferenza','Per i centri di entrambe le circonferenze','Perpendicolare al segmento che unisce i due centri, passando per il suo punto medio','Parallela al segmento che unisce i due centri'], correct:2 },
+  // RELAZIONI E FUNZIONI
+  { tag:'RELAZIONI_FUNZIONI', dim:'PROBLEM_SOLVING', text:'Un irrigatore fornisce acqua in base alla distanza. Dal grafico si legge che a 2 m di distanza una pianta riceve circa 12 mm/h. A quale distanza una pianta riceve esattamente 6 mm/h?', options:['3 m','4 m','5 m','6 m'], correct:2 },
+  { tag:'RELAZIONI_FUNZIONI', dim:'CONOSCERE', text:'Lo schema mostra: [x] [x] [3] = 53. Quale equazione rappresenta lo schema?', options:['3·2x = 53','x + 3x = 53','2x + 3 = 53','3 + x² = 53'], correct:2 },
+  { tag:'RELAZIONI_FUNZIONI', dim:'ARGOMENTARE', text:'Giovanna usa mollette così: 2 teli→3 mollette, 3 teli→4 mollette, 4 teli→5 mollette. Quale formula rappresenta il numero di mollette per n teli?', options:['n−1','n+1','2n−1','n+2'], correct:1 },
+  { tag:'RELAZIONI_FUNZIONI', dim:'PROBLEM_SOLVING', text:'Lo Iodio 131 dimezza la sua massa ogni 8 giorni. In quanti giorni si riduce da 2 grammi a 0,250 grammi?', options:['16 giorni','24 giorni','32 giorni','8 giorni'], correct:1 },
+  { tag:'RELAZIONI_FUNZIONI', dim:'CONOSCERE', text:'La formula del voto di laurea è V = (11/3)·M + T, dove M è la media (18–30) e T è il voto tesi (5–11). Pietro ha M=27 e vuole V≥105. Qual è il punteggio minimo T che deve ottenere?', options:['5','6','8','11'], correct:1 },
+  // DATI E PREVISIONI
+  { tag:'DATI_PREVISIONI', dim:'PROBLEM_SOLVING', text:'In un sacchetto ci sono 4 palline blu. Quante palline verdi si devono aggiungere affinché la probabilità di estrarre una pallina verde sia 2/3?', options:['2','6','8','12'], correct:2 },
+  { tag:'DATI_PREVISIONI', dim:'CONOSCERE', text:'40 alunni hanno svolto una prova di Italiano. Dai dati, 4 alunni hanno preso voto 5 in Italiano. Qual è la probabilità che uno studente scelto a caso abbia ottenuto voto 5 in Italiano?', options:['4/10','1/4','1/10','4/40 = 2/20'], correct:2 },
+  { tag:'DATI_PREVISIONI', dim:'ARGOMENTARE', text:'Il ristorante offre: 3 primi, 2 secondi, 2 dolci. Quanti menu completi diversi (un primo, un secondo e un dolce) si possono comporre?', options:['7','9','12','6'], correct:2 },
+  { tag:'DATI_PREVISIONI', dim:'PROBLEM_SOLVING', text:'Nel grafico sui prezzi della benzina nel mondo (in dollari al litro): America sett. 1,06 — America centr. 1,32 — Europa 1,86 — Asia 1,07 — Africa 1,45. In quale zona la benzina ha il prezzo più basso?', options:['Asia','Africa','America settentrionale','Europa'], correct:2 },
+  { tag:'DATI_PREVISIONI', dim:'CONOSCERE', text:'In Australia, la benzina costa 1,58 $/litro e il gasolio costa 1,57 $/litro. Quanto costa di più al litro la benzina rispetto al gasolio?', options:['0,01 centesimi di dollaro','0,1 centesimi di dollaro','1 centesimo di dollaro','10 centesimi di dollaro'], correct:2 },
+];
+
+// ─── MAGELLANO-STYLE INTEREST BATTERY ───
+// Block 1: Interests (14 domains, 4 items each = 56 items)
+const MAG_BLOCK1 = [
+  // LINGUISTICO-TURISTICO
+  { id:'L1a', domain:'linguistico-turistico', block:1, text:'Organizzare un viaggio all\'estero per un gruppo di persone, gestendo orari, alloggi e attività' },
+  { id:'L1b', domain:'linguistico-turistico', block:1, text:'Lavorare come guida turistica, spiegando la storia di luoghi e monumenti in lingue straniere' },
+  { id:'L1c', domain:'linguistico-turistico', block:1, text:'Tradurre testi o conversazioni tra persone che parlano lingue diverse' },
+  { id:'L1d', domain:'linguistico-turistico', block:1, text:'Aiutare turisti stranieri a orientarsi in una città e risolvere i loro problemi pratici' },
+  // TECNICO-MECCANICO
+  { id:'L2a', domain:'tecnico-meccanico', block:1, text:'Smontare e rimontare un oggetto meccanico rotto per capire come funziona e ripararlo' },
+  { id:'L2b', domain:'tecnico-meccanico', block:1, text:'Progettare e costruire un oggetto con materiali diversi (legno, metallo, plastica)' },
+  { id:'L2c', domain:'tecnico-meccanico', block:1, text:'Installare o configurare apparecchiature elettroniche o impianti elettrici' },
+  { id:'L2d', domain:'tecnico-meccanico', block:1, text:'Capire come funziona un motore e intervenire per migliorarne le prestazioni' },
+  // SOCIOASSISTENZIALE
+  { id:'L3a', domain:'socioassistenziale', block:1, text:'Aiutare una persona anziana con le attività quotidiane, stando vicino a lei nelle difficoltà' },
+  { id:'L3b', domain:'socioassistenziale', block:1, text:'Supportare una persona con disabilità a vivere in modo più autonomo' },
+  { id:'L3c', domain:'socioassistenziale', block:1, text:'Ascoltare qualcuno che attraversa un momento difficile e aiutarlo a trovare una soluzione' },
+  { id:'L3d', domain:'socioassistenziale', block:1, text:'Lavorare in una struttura che accoglie famiglie o persone in difficoltà economica' },
+  // ESTETICO
+  { id:'L4a', domain:'estetico', block:1, text:'Tagliare e acconciare i capelli o curare l\'aspetto fisico delle persone' },
+  { id:'L4b', domain:'estetico', block:1, text:'Applicare trucco, scegliere stili e aiutare qualcuno a valorizzare la propria immagine' },
+  { id:'L4c', domain:'estetico', block:1, text:'Progettare un look completo per un evento importante, coordinando abiti e accessori' },
+  { id:'L4d', domain:'estetico', block:1, text:'Prendersi cura della pelle e del benessere fisico delle persone attraverso trattamenti estetici' },
+  // AGRICOLO
+  { id:'L5a', domain:'agricolo', block:1, text:'Coltivare ortaggi o frutta, occupandoti dell\'irrigazione, della cura del terreno e del raccolto' },
+  { id:'L5b', domain:'agricolo', block:1, text:'Allevare animali da fattoria, occupandoti del loro nutrimento e della loro salute' },
+  { id:'L5c', domain:'agricolo', block:1, text:'Lavorare all\'aperto in un bosco o in una riserva naturale per preservare l\'ambiente' },
+  { id:'L5d', domain:'agricolo', block:1, text:'Trasformare prodotti agricoli (fare marmellata, formaggio, vino) seguendo processi artigianali' },
+  // EDUCATIVO
+  { id:'L6a', domain:'educativo', block:1, text:'Spiegare un concetto difficile a un bambino o a un ragazzo usando esempi semplici e creativi' },
+  { id:'L6b', domain:'educativo', block:1, text:'Organizzare giochi e attività educative per bambini piccoli' },
+  { id:'L6c', domain:'educativo', block:1, text:'Preparare materiali didattici (schede, presentazioni, esercizi) per aiutare qualcuno ad imparare' },
+  { id:'L6d', domain:'educativo', block:1, text:'Lavorare in una scuola o in un centro educativo, supportando insegnanti e studenti' },
+  // SANITARIO
+  { id:'L7a', domain:'sanitario', block:1, text:'Misurare la pressione, fare un prelievo o assistere un medico durante una visita' },
+  { id:'L7b', domain:'sanitario', block:1, text:'Monitorare le condizioni di un paziente in ospedale e comunicare cambiamenti ai medici' },
+  { id:'L7c', domain:'sanitario', block:1, text:'Spiegare a un paziente come prendere una terapia o come prendersi cura di sé dopo un\'operazione' },
+  { id:'L7d', domain:'sanitario', block:1, text:'Analizzare campioni biologici in laboratorio per contribuire a una diagnosi' },
+  // MILITARE
+  { id:'L8a', domain:'militare', block:1, text:'Addestrarti fisicamente e imparare procedure di sicurezza per intervenire in situazioni di emergenza' },
+  { id:'L8b', domain:'militare', block:1, text:'Proteggere persone o luoghi importanti, lavorando in squadra con altri in divisa' },
+  { id:'L8c', domain:'militare', block:1, text:'Partecipare a missioni di soccorso in zone colpite da calamità naturali o conflitti' },
+  { id:'L8d', domain:'militare', block:1, text:'Pianificare e coordinare operazioni complesse che richiedono ordine, disciplina e precisione' },
+  // ECONOMICO-AMMINISTRATIVO
+  { id:'L9a', domain:'economico-amministrativo', block:1, text:'Gestire i conti di un\'azienda, controllare le spese e preparare bilanci' },
+  { id:'L9b', domain:'economico-amministrativo', block:1, text:'Organizzare documenti, archivi e pratiche amministrative in modo ordinato e preciso' },
+  { id:'L9c', domain:'economico-amministrativo', block:1, text:'Analizzare i costi di un progetto e decidere dove investire per guadagnare di più' },
+  { id:'L9d', domain:'economico-amministrativo', block:1, text:'Negoziare contratti o accordi commerciali tra aziende diverse' },
+  // SCIENTIFICO-NATURALE
+  { id:'L10a', domain:'scientifico-naturale', block:1, text:'Condurre esperimenti in laboratorio per testare un\'ipotesi scientifica' },
+  { id:'L10b', domain:'scientifico-naturale', block:1, text:'Analizzare dati raccolti sul campo per capire un fenomeno naturale (clima, ecosistemi, specie)' },
+  { id:'L10c', domain:'scientifico-naturale', block:1, text:'Studiare come funziona il corpo umano a livello cellulare o molecolare' },
+  { id:'L10d', domain:'scientifico-naturale', block:1, text:'Sviluppare nuove soluzioni tecnologiche per problemi ambientali come l\'inquinamento' },
+  // ALBERGHIERO-GASTRONOMICO
+  { id:'L11a', domain:'alberghiero-gastronomico', block:1, text:'Cucinare piatti elaborati, sperimentando ingredienti e tecniche diverse' },
+  { id:'L11b', domain:'alberghiero-gastronomico', block:1, text:'Accogliere gli ospiti di un hotel, gestire le prenotazioni e risolvere i loro problemi' },
+  { id:'L11c', domain:'alberghiero-gastronomico', block:1, text:'Servire ai tavoli di un ristorante, consigliando i clienti sui piatti e sui vini' },
+  { id:'L11d', domain:'alberghiero-gastronomico', block:1, text:'Organizzare un evento (matrimonio, conferenza, cena di gala) in tutti i suoi dettagli logistici' },
+  // STORICO-LETTERARIO
+  { id:'L12a', domain:'storico-letterario', block:1, text:'Studiare come vivevano le civiltà antiche — cosa mangiavano, come si organizzavano, cosa credevano' },
+  { id:'L12b', domain:'storico-letterario', block:1, text:'Leggere e analizzare romanzi, poesie e testi letterari per capire cosa l\'autore voleva dire' },
+  { id:'L12c', domain:'storico-letterario', block:1, text:'Scrivere articoli, racconti o testi che spiegano eventi storici a un pubblico non specializzato' },
+  { id:'L12d', domain:'storico-letterario', block:1, text:'Fare ricerche in archivi, biblioteche o siti archeologi per recuperare informazioni del passato' },
+  // ARTISTICO
+  { id:'L13a', domain:'artistico', block:1, text:'Dipingere, disegnare o creare sculture che esprimano un\'emozione o un\'idea' },
+  { id:'L13b', domain:'artistico', block:1, text:'Progettare oggetti o spazi (mobili, abiti, ambienti) che siano belli e funzionali insieme' },
+  { id:'L13c', domain:'artistico', block:1, text:'Recitare in uno spettacolo teatrale o in un film, interpretando un personaggio' },
+  { id:'L13d', domain:'artistico', block:1, text:'Comporre musica, suonare uno strumento o cantare davanti a un pubblico' },
+  // GIURIDICO
+  { id:'L14a', domain:'giuridico', block:1, text:'Aiutare a scrivere documenti legali che proteggono i diritti di qualcuno (contratti, testamenti)' },
+  { id:'L14b', domain:'giuridico', block:1, text:'Difendere in tribunale una persona accusata di qualcosa, cercando prove e costruendo argomenti' },
+  { id:'L14c', domain:'giuridico', block:1, text:'Studiare le leggi e capire come si applicano a situazioni concrete della vita quotidiana' },
+  { id:'L14d', domain:'giuridico', block:1, text:'Mediare tra due persone in conflitto per trovare un accordo senza andare in tribunale' },
+];
+
+// Block 2: Self-efficacy (8 clusters, 3 items each = 24 items)
+const MAG_BLOCK2 = [
+  // SOCIOEDUCATIVO
+  { id:'E1a', cluster:'socioeducativo', block:2, text:'Imparare a lavorare pazientemente con bambini o ragazzi con difficoltà di apprendimento' },
+  { id:'E1b', cluster:'socioeducativo', block:2, text:'Sviluppare la capacità di supportare e motivare persone anziane o in difficoltà' },
+  { id:'E1c', cluster:'socioeducativo', block:2, text:'Acquisire le competenze per gestire un gruppo di persone con bisogni diversi' },
+  // TECNICO-MECCANICO
+  { id:'E2a', cluster:'tecnico-meccanico', block:2, text:'Imparare a usare strumenti meccanici ed elettronici in modo preciso e sicuro' },
+  { id:'E2b', cluster:'tecnico-meccanico', block:2, text:'Sviluppare la capacità di capire schemi tecnici e progettare soluzioni ingegneristiche' },
+  { id:'E2c', cluster:'tecnico-meccanico', block:2, text:'Acquisire le competenze per riparare o costruire macchine e impianti complessi' },
+  // GIURIDICO
+  { id:'E3a', cluster:'giuridico', block:2, text:'Imparare a leggere e interpretare testi legali complessi in modo accurato' },
+  { id:'E3b', cluster:'giuridico', block:2, text:'Sviluppare la capacità di costruire argomenti logici e difenderli con prove concrete' },
+  { id:'E3c', cluster:'giuridico', block:2, text:'Acquisire le competenze per mediare tra persone in conflitto e trovare soluzioni eque' },
+  // ARTISTICO-ARTIGIANALE
+  { id:'E4a', cluster:'artistico-artigianale', block:2, text:'Imparare tecniche artistiche (pittura, scultura, design) per creare opere originali' },
+  { id:'E4b', cluster:'artistico-artigianale', block:2, text:'Sviluppare la capacità di esprimere idee ed emozioni attraverso la musica, il teatro o la danza' },
+  { id:'E4c', cluster:'artistico-artigianale', block:2, text:'Acquisire le competenze artigianali per lavorare materiali come legno, ceramica o tessuto' },
+  // ECONOMICO
+  { id:'E5a', cluster:'economico', block:2, text:'Imparare a gestire conti, budget e bilanci aziendali in modo preciso' },
+  { id:'E5b', cluster:'economico', block:2, text:'Sviluppare la capacità di analizzare dati economici e prendere decisioni finanziarie' },
+  { id:'E5c', cluster:'economico', block:2, text:'Acquisire le competenze per negoziare accordi commerciali e convincere clienti o partner' },
+  // UMANISTICO-LINGUISTICO
+  { id:'E6a', cluster:'umanistico-linguistico', block:2, text:'Imparare a usare una lingua straniera in modo fluente in contesti professionali' },
+  { id:'E6b', cluster:'umanistico-linguistico', block:2, text:'Sviluppare la capacità di scrivere testi chiari, persuasivi e ben strutturati in italiano' },
+  { id:'E6c', cluster:'umanistico-linguistico', block:2, text:'Acquisire le competenze per analizzare testi letterari o storici e spiegarne il significato' },
+  // SCIENTIFICO
+  { id:'E7a', cluster:'scientifico', block:2, text:'Imparare a progettare esperimenti scientifici e interpretare i risultati in modo rigoroso' },
+  { id:'E7b', cluster:'scientifico', block:2, text:'Sviluppare la capacità di usare la matematica e la statistica per risolvere problemi complessi' },
+  { id:'E7c', cluster:'scientifico', block:2, text:'Acquisire le competenze per lavorare con tecnologie avanzate (informatica, biotecnologie, chimica)' },
+  // ALBERGHIERO
+  { id:'E8a', cluster:'alberghiero', block:2, text:'Imparare a cucinare piatti elaborati rispettando standard di qualità e sicurezza alimentare' },
+  { id:'E8b', cluster:'alberghiero', block:2, text:'Sviluppare la capacità di gestire ospiti con esigenze diverse in modo professionale e cortese' },
+  { id:'E8c', cluster:'alberghiero', block:2, text:'Acquisire le competenze organizzative per coordinare eventi complessi con molte persone coinvolte' },
+];
+
+// Block 3: Propensity (6 domains, 2 items each = 12 items)
+const MAG_BLOCK3 = [
+  // TECNICO-MECCANICO
+  { id:'P1a', domain:'tecnico-meccanico', block:3, text:'Pensi che in futuro lavorerai in un ambito che richiede di costruire, riparare o progettare oggetti o impianti?' },
+  { id:'P1b', domain:'tecnico-meccanico', block:3, text:'Ti vedi a usare strumenti tecnici o macchinari nel tuo lavoro da adulto?' },
+  // EDUCATIVO
+  { id:'P2a', domain:'educativo', block:3, text:'Pensi che in futuro lavorerai in un contesto che prevede di insegnare, educare o formare altre persone?' },
+  { id:'P2b', domain:'educativo', block:3, text:'Ti vedi a lavorare in una scuola, in un centro educativo o in un servizio per ragazzi?' },
+  // ALBERGHIERO
+  { id:'P3a', domain:'alberghiero', block:3, text:'Pensi che in futuro lavorerai in un hotel, un ristorante, un bar o nell\'organizzazione di eventi?' },
+  { id:'P3b', domain:'alberghiero', block:3, text:'Ti vedi a lavorare a stretto contatto con il pubblico in ambienti come la ristorazione o il turismo?' },
+  // ECONOMICO-COMMERCIALE
+  { id:'P4a', domain:'economico-commerciale', block:3, text:'Pensi che in futuro lavorerai in un ambito commerciale, finanziario o di gestione aziendale?' },
+  { id:'P4b', domain:'economico-commerciale', block:3, text:'Ti vedi a gestire conti, contratti o relazioni commerciali nel tuo lavoro?' },
+  // LINGUISTICO-TURISTICO
+  { id:'P5a', domain:'linguistico-turistico', block:3, text:'Pensi che in futuro utilizzerai regolarmente una lingua straniera nel tuo lavoro?' },
+  { id:'P5b', domain:'linguistico-turistico', block:3, text:'Ti vedi a lavorare in contesti internazionali o a contatto con persone di culture diverse?' },
+  // ARTISTICO-ARTIGIANALE
+  { id:'P6a', domain:'artistico-artigianale', block:3, text:'Pensi che in futuro lavorerai in un ambito creativo (arte, musica, design, moda, artigianato)?' },
+  { id:'P6b', domain:'artistico-artigianale', block:3, text:'Ti vedi a usare talenti creativi come strumento principale del tuo lavoro da adulto?' },
+];
+
+const MAG_ALL_ITEMS = [...MAG_BLOCK1, ...MAG_BLOCK2, ...MAG_BLOCK3];
+
+// Domain labels
+const DOMAIN_LABELS = {
+  'linguistico-turistico': 'Linguistico-Turistico',
+  'tecnico-meccanico': 'Tecnico-Meccanico',
+  'socioassistenziale': 'Socioassistenziale',
+  'estetico': 'Estetico',
+  'agricolo': 'Agricolo',
+  'educativo': 'Educativo',
+  'sanitario': 'Sanitario',
+  'militare': 'Militare',
+  'economico-amministrativo': 'Economico-Amm.',
+  'scientifico-naturale': 'Scientifico-Naturale',
+  'alberghiero-gastronomico': 'Alberghiero-Gastron.',
+  'storico-letterario': 'Storico-Letterario',
+  'artistico': 'Artistico',
+  'giuridico': 'Giuridico',
+  'socioeducativo': 'Socioeducativo',
+  'artistico-artigianale': 'Artistico-Artigianale',
+  'economico': 'Economico',
+  'umanistico-linguistico': 'Umanistico-Linguistico',
+  'scientifico': 'Scientifico',
+  'alberghiero': 'Alberghiero',
+  'economico-commerciale': 'Economico-Commerciale',
+};
+
+// Compute Magellano scores (0-100) from answers
+function computeMagScores(answers) {
+  const compute = (items, keyFn) => {
+    const groups = {};
+    items.forEach(item => {
+      const key = keyFn(item);
+      if(!groups[key]) groups[key] = [];
+      const val = answers[item.id];
+      if(val) groups[key].push(val);
+    });
+    const scores = {};
+    Object.entries(groups).forEach(([k, vals]) => {
+      scores[k] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length - 1) / 4 * 100) : 50;
+    });
+    return scores;
+  };
+  return {
+    b1: compute(MAG_BLOCK1, i => i.domain),
+    b2: compute(MAG_BLOCK2, i => i.cluster),
+    b3: compute(MAG_BLOCK3, i => i.domain),
+  };
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// ─── DEMO STUDENTS ───
+const DEMO_STUDENTS = [
+  {
+    id:'sofia',
+    name:'Sofia Rossi',
+    meta:'Femmina, 14 anni — Italia',
+    background: { genere:'Femmina', anno:2011, nascita_studente:'Italia', nascita_madre:'Italia', nascita_padre:'Italia', titolo_madre:'Laurea magistrale o superiore', titolo_padre:'Laurea triennale', occ_madre:'Dirigente/imprenditrice', occ_padre:'Libero professionista' },
+    cft: { total:24, serie:7, classif:7, matrici:7, topologia:3, qi:'115-129', label:'Notevolmente sopra la media' },
+    invalsi_it: { MA1:3, MA2:2, MA3:2, LESSICO:3, GRAMMATICA:3, total_pct:87 },
+    invalsi_math: { NUMERI:40, SPAZIO_FIGURE:40, RELAZIONI_FUNZIONI:40, DATI_PREVISIONI:40, CONOSCERE:50, PROBLEM_SOLVING:30, ARGOMENTARE:40, total_pct:40 },
+    riasec: null,
+    magellano: {
+      b1: { 'scientifico-naturale':78, 'storico-letterario':72, 'linguistico-turistico':65, 'artistico':70, 'socioassistenziale':68, 'giuridico':60, 'educativo':55, 'tecnico-meccanico':32, 'estetico':45, 'agricolo':38, 'militare':28, 'alberghiero-gastronomico':50, 'economico-amministrativo':48 },
+      b2: { 'umanistico-linguistico':80, 'scientifico':62, 'artistico-artigianale':70, 'socioeducativo':65, 'giuridico':58, 'economico':42, 'tecnico-meccanico':30, 'alberghiero':45 },
+      b3: { 'linguistico-turistico':60, 'artistico-artigianale':55, 'educativo':50, 'economico-commerciale':35, 'tecnico-meccanico':25, 'alberghiero':30 }
+    },
+    topInterests: ['scientifico-naturale','storico-letterario','artistico'],
+    topEfficacy: ['umanistico-linguistico','artistico-artigianale'],
+    holland:'scientifico-naturale / storico-letterario / artistico',
+    teacherRec:'Liceo classico',
+    tags:['CFT Alto','Math Bassa','IT Alta'],
+    note:'Alta discrepanza CFT/Matematica — esempio di potenziale non espresso'
+  },
+  {
+    id:'omar',
+    name:'Omar Bouazza',
+    meta:'Maschio, 13 anni — Origine: Marocco',
+    background: { genere:'Maschio', anno:2012, nascita_studente:'Italia', nascita_madre:'Marocco', nascita_padre:'Marocco', titolo_madre:'Licenza media', titolo_padre:'Licenza elementare', occ_madre:'Operaia/artigiana', occ_padre:'Operaio/artigiano' },
+    cft: { total:26, serie:8, classif:7, matrici:7, topologia:4, qi:'115-129', label:'Notevolmente sopra la media' },
+    invalsi_it: { MA1:2, MA2:2, MA3:2, LESSICO:2, GRAMMATICA:2, total_pct:67 },
+    invalsi_math: { NUMERI:80, SPAZIO_FIGURE:80, RELAZIONI_FUNZIONI:80, DATI_PREVISIONI:80, CONOSCERE:80, PROBLEM_SOLVING:80, ARGOMENTARE:80, total_pct:80 },
+    riasec: null,
+    magellano: {
+      b1: { 'scientifico-naturale':85, 'tecnico-meccanico':80, 'economico-amministrativo':72, 'giuridico':65, 'militare':60, 'storico-letterario':50, 'linguistico-turistico':55, 'agricolo':45, 'socioassistenziale':48, 'estetico':30, 'artistico':35, 'educativo':52, 'alberghiero-gastronomico':40 },
+      b2: { 'scientifico':88, 'tecnico-meccanico':82, 'economico':70, 'giuridico':65, 'umanistico-linguistico':55, 'socioeducativo':50, 'artistico-artigianale':30, 'alberghiero':38 },
+      b3: { 'tecnico-meccanico':55, 'economico-commerciale':60, 'linguistico-turistico':45, 'educativo':35, 'artistico-artigianale':25, 'alberghiero':30 }
+    },
+    topInterests: ['scientifico-naturale','tecnico-meccanico','economico-amministrativo'],
+    topEfficacy: ['scientifico','tecnico-meccanico'],
+    holland:'scientifico-naturale / tecnico-meccanico / economico-amministrativo',
+    teacherRec:'Istituto tecnico',
+    tags:['CFT Molto alto','Math Alta','Profilo forte'],
+    note:'DEMO ANTI-BIAS — profilo forte. AI dovrebbe suggerire Liceo scientifico.'
+  },
+  {
+    id:'giulia',
+    name:'Giulia Ferretti',
+    meta:'Femmina, 14 anni — Italia',
+    background: { genere:'Femmina', anno:2011, nascita_studente:'Italia', nascita_madre:'Italia', nascita_padre:'Italia', titolo_madre:'Diploma superiore', titolo_padre:'Diploma superiore', occ_madre:'Impiegata', occ_padre:'Impiegato' },
+    cft: { total:18, serie:5, classif:5, matrici:5, topologia:3, qi:'100-114', label:'Sopra la media' },
+    invalsi_it: { MA1:3, MA2:3, MA3:3, LESSICO:3, GRAMMATICA:3, total_pct:100 },
+    invalsi_math: { NUMERI:60, SPAZIO_FIGURE:40, RELAZIONI_FUNZIONI:60, DATI_PREVISIONI:60, CONOSCERE:60, PROBLEM_SOLVING:40, ARGOMENTARE:60, total_pct:55 },
+    riasec: null,
+    magellano: { b1: { 'artistico':90, 'storico-letterario':85, 'socioassistenziale':80, 'linguistico-turistico':75, 'educativo':72, 'giuridico':65, 'scientifico-naturale':48, 'tecnico-meccanico':22, 'militare':18, 'estetico':70, 'agricolo':35, 'alberghiero-gastronomico':55, 'economico-amministrativo':40 }, b2: { 'artistico-artigianale':88, 'umanistico-linguistico':82, 'socioeducativo':78, 'giuridico':60, 'scientifico':40, 'economico':42, 'tecnico-meccanico':20, 'alberghiero':50 }, b3: { 'artistico-artigianale':65, 'linguistico-turistico':55, 'educativo':60, 'economico-commerciale':30, 'tecnico-meccanico':15, 'alberghiero':40 } },
+    topInterests: ['artistico','storico-letterario','socioassistenziale'],
+    topEfficacy: ['artistico-artigianale','umanistico-linguistico'],
+    holland:'artistico / storico-letterario / socioassistenziale',
+    teacherRec:'Liceo classico',
+    tags:['IT Perfetta','CFT Media','Interessi Artistico-Umanistici'],
+    note:'Profilo umanistico-artistico forte'
+  }
+];
+// ─── APP STATE ───
+const state = {
+  currentView: 'somministrazione',
+  currentStep: 0, // 0=background, 1=cft, 2a=italiano, 2b=matematica, 3=riasec, 4=done
+  background: {},
+  cft: {
+    currentSubtest: 0, // 0=series, 1=classif, 2=matrici, 3=topologia
+    currentItem: 0,
+    answers: { serie:[], classif:[], matrici:[], topo:[] },
+    timers: { serie:null, classif:null, matrici:null, topo:null },
+    timeLeft: { serie:240, classif:240, matrici:240, topo:180 },
+    done: false
+  },
+  invalsi_it: {
+    currentQ: 0,
+    answers: new Array(15).fill(null),
+    done: false
+  },
+  invalsi_math: {
+    currentQ: 0,
+    answers: new Array(20).fill(null),
+    done: false
+  },
+  magellano: {
+    block: 1,      // current block 1,2,3
+    page: 0,       // page within block
+    answers: {},   // id → 1-5
+    done: false
+  },
+  teacher: {
+    selectedStudent: null, // 'sofia'|'omar'|'giulia'|'current'
+    teacherRec: '',
+    reportText: '',
+    generating: false
+  }
+};
+
+
+// ─── DOM REFS ───
+const $ = id => document.getElementById(id);
+
+// ─── INIT ───
+// ─── STUDENT REPORT VIEW ───
+
+function renderStudentReportView() {
+  const container = $('student-report-container');
+  if(!state.studentReport) state.studentReport = { selectedId: null, reportText: '' };
+
+  container.innerHTML = `
+  <div style="background:linear-gradient(135deg,#059669,#047857);color:white;padding:28px;border-radius:var(--radius);margin-bottom:24px;">
+    <h2 style="font-family:'Crimson Pro',serif;font-size:28px;color:white;margin-bottom:6px;">📄 Il Tuo Report di Orientamento</h2>
+    <p style="opacity:0.85;font-size:15px;">Questo report è stato preparato per te sulla base dei test che hai completato. Leggilo con calma — è per prendere meglio la MIRA per il tuo futuro!</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-green">👤</div>
+      <div>
+        <div class="card-title">Di chi vuoi vedere il report?</div>
+        <div class="card-subtitle">Profili demo precaricati per la presentazione.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      ${DEMO_STUDENTS.map(s=>`
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border:2px solid ${state.studentReport.selectedId===s.id?'var(--green)':'var(--gray-200)'};border-radius:var(--radius-sm);cursor:pointer;background:${state.studentReport.selectedId===s.id?'var(--green-pale)':'white'};transition:all 0.2s;"
+           onclick="selectStudentReport('${s.id}')">
+        <div style="font-size:24px;">👤</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;color:var(--navy);">${s.name}</div>
+          <div style="font-size:13px;color:var(--gray-500);">${s.meta}</div>
+        </div>
+        <div style="font-size:13px;color:var(--gray-500);">Consiglio prof: <strong style="color:var(--navy);">${s.teacherRec}</strong></div>
+      </div>`).join('')}
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border:2px solid ${state.studentReport.selectedId==='current'?'var(--green)':'var(--gray-200)'};border-radius:var(--radius-sm);cursor:pointer;background:${state.studentReport.selectedId==='current'?'var(--green-pale)':'white'};transition:all 0.2s;"
+           onclick="selectStudentReport('current')">
+        <div style="font-size:24px;">🔴</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;color:var(--navy);">Sessione corrente</div>
+          <div style="font-size:13px;color:var(--gray-500);">${state.currentStep>=5?'✅ Test completati':'⏳ Test non ancora completati'}</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-success" onclick="generateStudentReport()" ${!state.studentReport.selectedId?'disabled':''}>
+      ✨ Genera il mio report
+    </button>
+  </div>
+
+  <div id="student-report-output"></div>`;
+}
+
+function selectStudentReport(id) {
+  if(!state.studentReport) state.studentReport = {};
+  state.studentReport.selectedId = id;
+  state.studentReport.reportText = '';
+  renderStudentReportView();
+}
+
+// ─── HARDCODED DEMO REPORTS ───
+const DEMO_STUDENT_REPORTS = {
+  omar: `COME RAGIONI
+Omar, il tuo modo di ragionare è uno dei punti di forza più solidi che abbiamo misurato. Nei test che valutano la capacità di trovare regole nascoste, collegare concetti astratti e capire come le cose si relazionano tra loro, hai ottenuto risultati **notevolmente superiori alla media** dei tuoi coetanei. Hai risolto quasi tutte le sequenze logiche e ti sei comportato benissimo anche con le classificazioni e le matrici — abilità che richiedono di ragionare per schemi e analogie. L'unica area dove c'è ancora margine riguarda il ragionamento spaziale: immaginare come cambiano le forme nella tua testa. È un'abilità che si allena facilmente, e non cambia il quadro generale che è molto positivo.
+
+ITALIANO E LETTURA
+In italiano hai dimostrato una competenza equilibrata e solida: capisci le informazioni presenti nei testi, sai ricostruire il significato di quello che leggi e padroni la grammatica con buona sicurezza. Il tuo profilo suggerisce che hai le basi linguistiche per affrontare testi complessi. Con un po' più di lettura regolare — anche solo romanzi o articoli che ti piacciono — puoi rafforzare ulteriormente questa area, che sarà importante in qualsiasi percorso sceglierai.
+
+MATEMATICA
+In matematica hai ottenuto risultati **decisamente sopra la media**: numeri, figure geometriche, relazioni e funzioni — praticamente in ogni area hai risposto correttamente alla grande maggioranza delle domande. Questo è uno dei dati più significativi del tuo profilo, perché la matematica è la materia che più distingue chi può affrontare un percorso tecnico-scientifico impegnativo da chi fatica. Tu non fatichi: hai le basi, e hai anche la capacità logica per andare avanti.
+
+I TUOI INTERESSI
+Dai questionari che hai compilato emerge un profilo di interessi molto coerente e definito. Sei attratto dalla scienza e dalla natura — capire come funzionano le cose, studiare fenomeni, fare esperimenti. Hai anche un forte interesse per il mondo tecnico e meccanico, e per le questioni economiche e organizzative. Non stai ancora scegliendo un lavoro: stai capendo come sei fatto. E quello che emerge è qualcuno che vuole **capire e costruire**, non solo eseguire.
+
+STUDENTI COME TE
+Nel database di MIRA ci sono due studenti — chiamiamoli Luca e Matteo — che avevano punteggi di ragionamento logico e matematica quasi identici ai tuoi. Entrambi sono stati consigliati per il **Liceo Scientifico** e lo hanno completato senza particolari difficoltà. Questo non significa che sarà automaticamente facile anche per te, ma significa che il tuo profilo è del tutto compatibile con quel percorso. I dati non mentono.
+
+IL CONSIGLIO DI MIRA
+**MIRA consiglia: Liceo Scientifico.**
+
+Perché? Perché hai un ragionamento logico elevato, una matematica solida e interessi orientati verso la scienza e la comprensione del mondo. Il Liceo Scientifico ti darà una formazione ampia che tiene aperte molte porte: ingegneria, informatica, medicina, economia, ma anche — se cambi idea — molte facoltà umanistiche. È il percorso che meglio valorizza quello che sei bravo a fare, ora.
+
+IL CONSIGLIO DEL TUO INSEGNANTE
+La tua insegnante ha consigliato l'**Istituto Tecnico**. È un percorso serio, concreto, che porta a professioni importanti. Se hai già in mente un lavoro tecnico specifico e vuoi arrivarci prima, il tecnico può essere una scelta valida. Ma il consiglio di MIRA è diverso: i tuoi dati dicono che puoi puntare più in alto. Parlane con la tua famiglia e con la tua insegnante, mostragli questo report, e decidi insieme. La scelta è tua.
+
+UN CONSIGLIO FINALE
+Omar, i numeri che abbiamo misurato sono quelli di uno studente capace. Non lasciare che nessuno — nemmeno inavvertitamente — ti faccia puntare più in basso di quello che meriti. Qualunque scuola tu scelga, sceglila perché la vuoi tu, non perché qualcuno si aspetta che tu la scelga. Siamo dalla tua parte.`,
+};
+
+const DEMO_TEACHER_REPORTS = {
+  omar: `PROFILO DI INTERESSI PROFESSIONALI
+Il profilo di interessi di Omar, misurato attraverso il questionario Magellano Junior 2, mostra una concentrazione molto marcata sui domini scientifico-naturale (85/100) e tecnico-meccanico (80/100), seguiti dall'area economico-amministrativa (72/100). Il blocco di autoefficacia percepita conferma questa struttura: Omar si sente molto capace di apprendere competenze scientifiche (88/100) e tecnico-meccaniche (82/100). Il blocco di propensione, pur più cauto come è tipico degli studenti con background familiare working-class, mostra aspettative positive verso l'area economico-commerciale e tecnica. È importante notare che la propensione attesa tende a riflettere le aspettative sociali più che il potenziale reale: in questo caso, i blocchi 1 e 2 sono più diagnosticamente rilevanti del blocco 3.
+
+PROFILO COGNITIVO E ACCADEMICO
+
+Ragionamento Fluido (CFT)
+Omar ottiene un punteggio grezzo di 26/30 al CFT 20-R, che corrisponde a una banda di QI stimato 115-129 — notevolmente sopra la media per la sua fascia d'età. I subtest mostrano una prestazione uniforme e solida: 8/8 nelle serie (massimo), 7/8 nelle classificazioni, 7/8 nelle matrici, 4/6 nella topologia. L'unico margine di miglioramento riguarda il ragionamento spaziale, che non costituisce un elemento critico per i percorsi liceali.
+
+Competenze Linguistiche (INVALSI Italiano)
+Omar raggiunge il 67% nell'INVALSI di italiano — una performance nella fascia media, con punteggi equilibrati tra le diverse dimensioni. Non emergono lacune strutturali: la comprensione del testo è adeguata in tutte le sotto-aree. Un ulteriore sviluppo delle competenze linguistiche è possibile e prevedibile nel corso del biennio, indipendentemente dal percorso scelto.
+
+Competenze Matematiche (INVALSI Matematica)
+Il risultato più significativo del profilo di Omar è la matematica: 80% complessivo, con performance superiori al 75% in tutti e quattro i domini (Numeri, Spazio e Figure, Relazioni e Funzioni, Dati e Previsioni). La dimensione di Problem Solving è particolarmente elevata. Questo punteggio colloca Omar nel quartile superiore a livello nazionale per la matematica di terza media.
+
+CONFRONTO CON STUDENTI SIMILI
+Nel dataset di confronto sono disponibili due profili di studenti con caratteristiche di test molto simili a quelle di Omar. Luca M. (italiano, padre ingegnere): CFT 25/30, Matematica 76%, Italiano 72%, interessi scientifico-naturale e tecnico-meccanico — consiglio ricevuto: Liceo Scientifico. Matteo R. (italiano): CFT 24/30, Matematica 82%, Italiano 68%, interessi analoghi — consiglio ricevuto: Liceo Scientifico.
+
+Omar ha un punteggio CFT superiore a entrambi e una matematica paragonabile o superiore. I tre profili di test sono sostanzialmente equivalenti. La differenza nei consigli ricevuti non è spiegabile dai dati cognitivi e accademici.
+
+RACCOMANDAZIONE AI
+MIRA raccomanda il **Liceo Scientifico**.
+
+Il profilo di Omar soddisfa tutti i criteri predittivi associati al successo in questo percorso: ragionamento fluido nel quartile superiore, matematica solida su tutti i domini, interessi convergenti verso le scienze e la tecnologia, e autoefficacia percepita molto elevata nelle aree STEM. Il confronto con studenti simili che hanno ricevuto e completato con successo il Liceo Scientifico rafforza questa indicazione. Non vi è alcun elemento nel profilo dei test che giustifichi un percorso di minore impegno accademico.
+
+NOTA METODOLOGICA
+Le soglie utilizzate per questa segnalazione sono costruite a partire da descrittori di livello INVALSI e distribuzioni nazionali dei punteggi, e costituiscono approssimazioni operative piuttosto che soglie calibrate empiricamente su dati longitudinali italiani. La quantità empiricamente corretta richiederebbe l'accesso al pannello longitudinale INVALSI-SNV tramite CINECA (invalsi-areastatistica.cineca.it), che rappresenta una priorità per la Fase 2 di questo progetto di ricerca. Questo report è uno strumento di supporto alla decisione dell'insegnante, non un sostituto del giudizio professionale.
+
+SEGNALAZIONE
+MIRA ha rilevato una discrepanza significativa tra il consiglio attuale (Istituto Tecnico) e la raccomandazione basata sul profilo dei test (Liceo Scientifico). Due studenti con punteggi analoghi presenti nel dataset hanno ricevuto la raccomandazione per il Liceo Scientifico. Potrebbe valere la pena riconsiderare questa indicazione alla luce dei dati? La decisione finale rimane naturalmente sua.`,
+};
+
+async function generateStudentReport() {
+  const id = state.studentReport?.selectedId;
+  if(!id) return;
+  const student = getStudentData(id);
+  if(!student) { alert('Lo studente non ha ancora completato i test.'); return; }
+
+  // Serve hardcoded demo report instantly for presentation
+  if(DEMO_STUDENT_REPORTS[id]) {
+    renderStudentReportOutput(DEMO_STUDENT_REPORTS[id], student, student.teacherRec || 'non specificato');
+    return;
+  }
+
+  $('student-report-output').innerHTML = `
+  <div class="report-output">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <div style="font-size:15px;font-weight:700;color:var(--navy);">Stiamo preparando il tuo report personalizzato…</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-top:6px;">Ci vuole qualche secondo.</div>
+    </div>
+  </div>`;
+
+  const cft = student.cft;
+  const it = student.invalsi_it;
+  const math = student.invalsi_math;
+  const mag = student.magellano || { b1:{}, b2:{}, b3:{} };
+  const topInterests = (student.topInterests || []).map(d => DOMAIN_LABELS[d] || d);
+  const teacherRec = student.teacherRec || 'non specificato';
+
+  const PEER_COMPARISONS = {
+    omar: `Nel nostro database ci sono studenti con punteggi simili ai tuoi — per esempio Luca M. e Matteo R., che avevano ragionamento logico e matematica quasi identici ai tuoi — e la grande maggioranza ha completato il Liceo Scientifico senza difficoltà particolari. Il tuo profilo suggerisce che hai le basi per affrontare quel percorso.`,
+    sofia: `Studenti con il tuo stesso livello di ragionamento logico e le tue stesse passioni per le materie umanistiche hanno completato sia il Liceo Classico che il Liceo Scientifico. Il tuo punteggio INVALSI di matematica è più basso, ma questo tipo di divario si recupera spesso durante il primo anno — specialmente quando la curiosità è alta come nel tuo caso.`,
+    giulia: `Studenti con il tuo profilo — italiano eccellente, forte interesse per l'arte e il sociale — hanno completato il Liceo Classico con ottimi risultati, in particolare in letteratura, storia dell'arte e filosofia. Molti si sono poi iscritti a facoltà come lettere, psicologia, scienze della comunicazione e belle arti.`,
+    current: `Nel database di MIRA ci sono studenti con profili simili al tuo. La maggior parte di quelli con punteggi paragonabili ha completato con successo il percorso suggerito. Ricorda: il percorso scolastico è un punto di partenza, non un destino fisso.`
+  };
+
+  const systemPrompt = `Sei MIRA, uno strumento di orientamento scolastico. Scrivi un report per uno studente italiano di terza media (13-14 anni) e la sua famiglia.
+
+REGOLE DI LINGUAGGIO:
+- Parla direttamente allo studente usando il "tu", caldo e incoraggiante
+- Niente tecnicismi: trasforma i numeri in frasi ("hai risolto bene la maggior parte delle sequenze" non "CFT = 24/30")
+- Spiega cosa misura ogni test in modo concreto e accessibile
+- I punti di forza vanno evidenziati; i punti deboli vanno formulati come opportunità di crescita
+- Scrivi in paragrafi fluidi, senza elenchi puntati
+
+STRUTTURA — usa esattamente queste intestazioni in maiuscolo:
+COME RAGIONI
+ITALIANO E LETTURA
+MATEMATICA
+I TUOI INTERESSI
+STUDENTI COME TE
+IL CONSIGLIO DI MIRA
+IL CONSIGLIO DEL TUO INSEGNANTE
+UN CONSIGLIO FINALE
+
+Per IL CONSIGLIO DI MIRA: indica esplicitamente quale percorso consiglia MIRA (scegli tra: Liceo Scientifico, Liceo Classico, Liceo Linguistico, Liceo delle Scienze Umane, Istituto Tecnico, Istituto Professionale) e spiega in 2-3 frasi semplici perché, basandoti sui punti di forza dello studente. Se il consiglio MIRA coincide con quello dell'insegnante, dillo chiaramente. Se è diverso, spiegalo con delicatezza, senza sminuire il consiglio dell'insegnante.
+
+Per IL CONSIGLIO DEL TUO INSEGNANTE: riporta il consiglio dell'insegnante e, se diverso da quello di MIRA, spiega che entrambe le opzioni hanno senso e che la decisione finale spetta allo studente e alla famiglia.
+
+Lunghezza: circa 500-600 parole. Tono: caldo, diretto, motivante.`;
+
+  const userMessage = `Scrivi il report per ${student.name}.
+
+Ragionamento logico (CFT): ${cft.total}/30 — ${cft.label}. Subtest: Serie ${cft.serie}/8, Classificazioni ${cft.classif}/8, Matrici ${cft.matrici}/8, Relazioni spaziali ${cft.topologia}/6.
+
+INVALSI Italiano (${it.total_pct}%): capire info esplicite ${it.MA1}/3, ricostruire significato ${it.MA2}/3, riflessione critica ${it.MA3}/3, lessico ${it.LESSICO}/3, grammatica ${it.GRAMMATICA}/3.
+
+INVALSI Matematica (${math.total_pct}%): Numeri ${math.NUMERI}%, Spazio/Figure ${math.SPAZIO_FIGURE}%, Relazioni/Funzioni ${math.RELAZIONI_FUNZIONI}%, Dati ${math.DATI_PREVISIONI}%.
+
+Interessi principali (Magellano): ${topInterests.join(', ')}.
+Cosa si sente capace di imparare: ${(student.topEfficacy||[]).map(d=>DOMAIN_LABELS[d]||d).join(', ')}.
+
+Consiglio dell'insegnante: ${teacherRec}.
+
+Testo da inserire nella sezione STUDENTI COME TE (riprendi questo, riscrivilo in modo caldo e diretto):
+${PEER_COMPARISONS[id] || PEER_COMPARISONS.current}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+    const data = await res.json();
+    if(data.content?.[0]) {
+      renderStudentReportOutput(data.content[0].text, student, teacherRec);
+    } else throw new Error('Nessuna risposta dal modello');
+  } catch(err) {
+    $('student-report-output').innerHTML = `
+    <div class="report-output" style="border:2px solid var(--red);">
+      <div style="color:var(--red);font-weight:700;">⚠️ Errore</div>
+      <div style="font-size:14px;color:var(--gray-600);margin-top:8px;">${err.message}</div>
+    </div>`;
+  }
+}
+
+function renderStudentReportOutput(text, student, teacherRec) {
+  const SECTIONS = ['COME RAGIONI','ITALIANO E LETTURA','MATEMATICA','I TUOI INTERESSI','STUDENTI COME TE','IL CONSIGLIO DI MIRA','IL CONSIGLIO DEL TUO INSEGNANTE','UN CONSIGLIO FINALE'];
+  const ICONS   = { 'COME RAGIONI':'🧠','ITALIANO E LETTURA':'📖','MATEMATICA':'🔢','I TUOI INTERESSI':'❤️','STUDENTI COME TE':'👥','IL CONSIGLIO DI MIRA':'🎯','IL CONSIGLIO DEL TUO INSEGNANTE':'👩‍🏫','UN CONSIGLIO FINALE':'✨' };
+  const BG      = { 'COME RAGIONI':'#dbeafe','ITALIANO E LETTURA':'#fef3c7','MATEMATICA':'#d1fae5','I TUOI INTERESSI':'#fce7f3','STUDENTI COME TE':'#ede9fe','IL CONSIGLIO DEL TUO INSEGNANTE':'#f0f7ff','UN CONSIGLIO FINALE':'#064e3b' };
+  const TC      = { 'UN CONSIGLIO FINALE':'white' };
+
+  // Robust parser: match sections by proximity, not exact line equality
+  const parsed = {};
+  let cur = '';
+  for(const line of text.split('\n')) {
+    const clean = line.trim();
+    if(!clean || clean === '---') continue;
+    const hit = SECTIONS.find(s => clean.toUpperCase().includes(s));
+    if(hit) { cur = hit; if(!parsed[hit]) parsed[hit] = ''; }
+    else if(cur) parsed[cur] += clean + '\n';
+  }
+
+  // Extract track name from IL CONSIGLIO DI MIRA block
+  const miraBlock = (parsed['IL CONSIGLIO DI MIRA'] || '').trim();
+  let trackName = '';
+  const trackMatch = miraBlock.match(/Liceo Scientifico|Liceo Classico|Liceo Linguistico|Liceo delle Scienze Umane|Istituto Tecnico|Istituto Professionale/i);
+  if(trackMatch) trackName = trackMatch[0];
+
+  let html = `<div class="report-output">
+  <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--green);">
+    <div style="font-family:'Crimson Pro',serif;font-size:26px;color:var(--navy);margin-bottom:4px;">Il tuo report — ${student.name}</div>
+    <div style="font-size:13px;color:var(--gray-500);">Generato il ${new Date().toLocaleDateString('it-IT')} &middot; Consiglio dell'insegnante: <strong>${teacherRec}</strong></div>
+  </div>`;
+
+  // Render all sections except the two recommendation ones first
+  const CONTENT_SECTIONS = ['COME RAGIONI','ITALIANO E LETTURA','MATEMATICA','I TUOI INTERESSI','STUDENTI COME TE'];
+  for(const key of CONTENT_SECTIONS) {
+    const body = (parsed[key] || '').trim();
+    if(!body) continue;
+    html += `
+  <div style="background:${BG[key]||'#f8fafc'};border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--navy);opacity:0.7;margin-bottom:8px;">${ICONS[key]} ${key}</div>
+    <div style="font-size:15px;color:var(--gray-700);line-height:1.8;">${body.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
+  </div>`;
+  }
+
+  // Hero recommendation box — MIRA
+  if(miraBlock) {
+    html += `
+  <div style="background:var(--navy);border-radius:var(--radius);padding:24px 28px;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.6);margin-bottom:12px;">🎯 IL CONSIGLIO DI MIRA</div>
+    ${trackName ? `<div style="font-family:'Crimson Pro',serif;font-size:32px;font-weight:600;color:#60a5fa;margin-bottom:12px;">${trackName}</div>` : ''}
+    <div style="font-size:15px;color:rgba(255,255,255,0.9);line-height:1.8;">${miraBlock.replace(new RegExp(trackName,'gi'),`<strong style="color:#60a5fa;">${trackName}</strong>`).replace(/\*\*(.*?)\*\*/g,'<strong style="color:white;">$1</strong>').replace(/\n/g,'<br>')}</div>
+  </div>`;
+  }
+
+  // Teacher recommendation box
+  const teacherBlock = (parsed['IL CONSIGLIO DEL TUO INSEGNANTE'] || '').trim();
+  if(teacherBlock) {
+    html += `
+  <div style="background:#f0f7ff;border:2px solid var(--blue-pale);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--navy);opacity:0.7;margin-bottom:8px;">👩‍🏫 IL CONSIGLIO DEL TUO INSEGNANTE</div>
+    <div style="font-size:15px;color:var(--gray-700);line-height:1.8;">${teacherBlock.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
+  </div>`;
+  }
+
+  // Final advice
+  const finalBlock = (parsed['UN CONSIGLIO FINALE'] || '').trim();
+  if(finalBlock) {
+    html += `
+  <div style="background:#064e3b;border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:8px;">✨ UN CONSIGLIO FINALE</div>
+    <div style="font-size:15px;color:rgba(255,255,255,0.9);line-height:1.8;">${finalBlock.replace(/\*\*(.*?)\*\*/g,'<strong style="color:white;">$1</strong>').replace(/\n/g,'<br>')}</div>
+  </div>`;
+  }
+
+  html += `
+  <div style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px;color:var(--gray-400);line-height:1.6;">
+    📋 Questo report è uno strumento di supporto alla decisione. La scelta finale spetta a te e alla tua famiglia, insieme ai tuoi insegnanti. MIRA è un prototipo di ricerca — non per uso clinico o decisionale reale.
+  </div></div>`;
+
+  $('student-report-output').innerHTML = html;
+}
+
+// ─── DEMO FLAGS DATA ───
+const DEMO_FLAGS = {
+  sofia: {
+    teacherRec: 'Liceo classico',
+    aiRec: 'Liceo scientifico',
+    flagReason: `Il profilo cognitivo di Sofia mostra un ragionamento fluido notevolmente sopra la media (CFT 24/30, QI stimato 115-129), compatibile con i percorsi liceali più selettivi. Tuttavia il consiglio per il Liceo Classico si basa principalmente sulla forte performance in Italiano (87%) trascurando la discrepanza con la Matematica (40%).
+
+MIRA suggerisce il Liceo Scientifico perché: (1) il punteggio CFT indica un potenziale logico-matematico elevato non riflesso nei risultati INVALSI Matematica — possibile lacuna recuperabile piuttosto che limite strutturale; (2) il profilo Magellano mostra forti interessi in scientifico-naturale e storico-letterario con alta autoefficacia umanistico-linguistica; (3) il Liceo Scientifico consente l'accesso sia a percorsi STEM che umanistici, mentre il Classico restringe le opzioni future.`
+  },
+  omar: {
+    teacherRec: 'Istituto tecnico',
+    aiRec: 'Liceo scientifico',
+    flagReason: `Omar mostra uno dei profili più forti nel campione: CFT 26/30 (QI 115-129), INVALSI Matematica 80%, INVALSI Italiano 67%, interessi Magellano: scientifico-naturale // tecnico-meccanico // economico-amministrativo. Il consiglio per l'Istituto Tecnico non è giustificato dal profilo dei test.
+
+MIRA segnala questa discrepanza perché: (1) il punteggio CFT e il risultato INVALSI Matematica collocano Omar nella fascia tipicamente associata al Liceo Scientifico; (2) il profilo Magellano mostra interessi dominanti in scientifico-naturale e tecnico-meccanico con autoefficacia scientifica al massimo del campione (88/100); (3) Luca M., uno studente con un profilo di test quasi identico (CFT 25/30, Matematica 76%, stessi interessi prevalenti), ha ricevuto la raccomandazione per il Liceo Scientifico. Il background familiare e l'origine non sono elementi rilevanti per la raccomandazione di percorso.`
+  }
+};
+
+// ─── DEMO NAVIGATION ───
+const DEMO_BTN_IDS = { background:'db-bg', cft1:'db-cft1', cft2:'db-cft2', cft3:'db-cft3', cft4:'db-cft4', italiano:'db-it', matematica:'db-math', mag1:'db-mag1', mag2:'db-mag2', mag3:'db-mag3', done:'db-done', teacher:'db-teacher', 'student-report':'db-student-report' };
+
+function demoJump(section) {
+  Object.values(DEMO_BTN_IDS).forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  const activeBtn = document.getElementById(DEMO_BTN_IDS[section]);
+  if(activeBtn) activeBtn.classList.add('active');
+
+  if(section === 'teacher') {
+    if(state.currentStep < 5) state.currentStep = 5;
+    switchView('teacher');
+    return;
+  }
+
+  if(section === 'student-report') {
+    if(state.currentStep < 5) state.currentStep = 5;
+    switchView('student-report');
+    return;
+  }
+
+  switchView('somministrazione');
+
+  const ensureBg = () => {
+    if(!state.background.genere) state.background = { genere:'Demo', anno:2011, nascita_studente:'Italia', nascita_madre:'Italia', nascita_padre:'Italia', titolo_madre:'Diploma superiore', titolo_padre:'Diploma superiore', occ_madre:'Impiegata', occ_padre:'Impiegato' };
+  };
+
+  const jumpCFT = (subtestIdx) => {
+    ensureBg();
+    state.currentStep = 1;
+    state.cft.currentSubtest = subtestIdx;
+    state.cft.currentItem = 0;
+    if(cftTimer) clearInterval(cftTimer);
+    renderCFT();
+  };
+
+  if(section === 'background') {
+    state.currentStep = 0;
+    renderBackground();
+  } else if(section === 'cft1') { jumpCFT(0);
+  } else if(section === 'cft2') { jumpCFT(1);
+  } else if(section === 'cft3') { jumpCFT(2);
+  } else if(section === 'cft4') { jumpCFT(3);
+  } else if(section === 'italiano') {
+    state.currentStep = 2;
+    state.invalsi_it.currentQ = 0;
+    renderInvalsiItaliano();
+  } else if(section === 'matematica') {
+    state.currentStep = 3;
+    state.invalsi_math.currentQ = 0;
+    renderInvalsiMatematica();
+  } else if(section === 'mag1') {
+    state.currentStep = 4;
+    state.magellano.block = 1;
+    state.magellano.page = 0;
+    renderMagellano();
+  } else if(section === 'mag2') {
+    state.currentStep = 4;
+    state.magellano.block = 2;
+    state.magellano.page = 0;
+    renderMagellano();
+  } else if(section === 'mag3') {
+    state.currentStep = 4;
+    state.magellano.block = 3;
+    state.magellano.page = 0;
+    renderMagellano();
+  } else if(section === 'done') {
+    state.currentStep = 5;
+    renderCompletion();
+  }
+
+  window.scrollTo(0, 0);
+}
+
+// ─── FLAG MODAL ───
+let currentFlagStudentId = null;
+
+function openFlagModal(studentId) {
+  const student = DEMO_STUDENTS.find(s => s.id === studentId);
+  const flag = DEMO_FLAGS[studentId];
+  if(!student || !flag) return;
+
+  currentFlagStudentId = studentId;
+
+  document.getElementById('flag-modal-title').textContent = `⚠️ Segnalazione MIRA — ${student.name}`;
+  document.getElementById('flag-modal-subtitle').textContent = `MIRA ha rilevato una discrepanza tra il tuo consiglio e il profilo dello studente`;
+  document.getElementById('flag-modal-tracks').innerHTML = `
+    <div style="flex:1;min-width:120px;background:#fee2e2;border:2px solid #dc2626;border-radius:8px;padding:12px;text-align:center;">
+      <div style="font-size:11px;font-weight:800;color:#991b1b;text-transform:uppercase;margin-bottom:4px;">Tuo consiglio</div>
+      <div style="font-size:15px;font-weight:700;color:#7f1d1d;">${flag.teacherRec}</div>
+    </div>
+    <div style="font-size:20px;align-self:center;color:#94a3b8;flex-shrink:0;">→</div>
+    <div style="flex:1;min-width:120px;background:#d1fae5;border:2px solid #059669;border-radius:8px;padding:12px;text-align:center;">
+      <div style="font-size:11px;font-weight:800;color:#065f46;text-transform:uppercase;margin-bottom:4px;">Suggerimento MIRA</div>
+      <div style="font-size:15px;font-weight:700;color:#064e3b;">${flag.aiRec}</div>
+    </div>`;
+  document.getElementById('flag-modal-body').innerHTML = flag.flagReason.replace(/\n\n/g, '<br><br>');
+
+  // Reset state
+  document.getElementById('flag-modal-actions').style.display = 'flex';
+  document.getElementById('flag-modal-outcome').style.display = 'none';
+  document.getElementById('flag-modal-overlay').style.display = 'flex';
+}
+
+function resolveFlag(decision) {
+  const actions = document.getElementById('flag-modal-actions');
+  const outcome = document.getElementById('flag-modal-outcome');
+  const flag = DEMO_FLAGS[currentFlagStudentId];
+
+  actions.style.display = 'none';
+  outcome.style.display = 'block';
+
+  if(decision === 'confirm') {
+    outcome.style.background = '#fff7ed';
+    outcome.style.border = '2px solid #d97706';
+    outcome.style.color = '#92400e';
+    outcome.innerHTML = `✋ <strong>Decisione confermata.</strong> Il tuo consiglio per <strong>${flag.teacherRec}</strong> è stato registrato. MIRA terrà traccia della discrepanza nel report finale.`;
+    // Mark student as confirmed
+    if(currentFlagStudentId) {
+      DEMO_FLAGS[currentFlagStudentId].resolved = 'confirmed';
+    }
+  } else {
+    outcome.style.background = '#d1fae5';
+    outcome.style.border = '2px solid #059669';
+    outcome.style.color = '#065f46';
+    outcome.innerHTML = `🔄 <strong>Decisione rivista.</strong> Il percorso consigliato viene aggiornato a <strong>${flag.aiRec}</strong>. Genera il report AI per l'analisi completa.`;
+    if(currentFlagStudentId) {
+      DEMO_FLAGS[currentFlagStudentId].resolved = 'revised';
+      // Update the demo student's teacherRec to match AI suggestion
+      const student = DEMO_STUDENTS.find(s => s.id === currentFlagStudentId);
+      if(student) student.teacherRec = flag.aiRec;
+    }
+  }
+
+  // Close after short delay and refresh student cards
+  setTimeout(() => {
+    document.getElementById('flag-modal-overlay').style.display = 'none';
+    // Update flag badge on card to show resolved state
+    renderTeacherView();
+    if(currentFlagStudentId) selectStudent(currentFlagStudentId);
+  }, 2000);
+}
+
+function closeFlagModal(e) {
+  if(!e || e.target === document.getElementById('flag-modal-overlay')) {
+    document.getElementById('flag-modal-overlay').style.display = 'none';
+  }
+}
+
+// Init on load
+function init() {
+  state.magellano._b1 = shuffleArray(MAG_BLOCK1);
+  state.magellano._b2 = shuffleArray(MAG_BLOCK2);
+  state.magellano._b3 = shuffleArray(MAG_BLOCK3);
+  renderSomministrazione();
+}
+
+// ─── NAV ───
+function switchView(view) {
+  state.currentView = view;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-view="${view}"]`).classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(view).classList.add('active');
+  if(view === 'teacher') renderTeacherView();
+  if(view === 'student-report') renderStudentReportView();
+}
+
+// ─── PROGRESS ───
+const STEP_LABELS = ['Dati','CFT','Italiano','Matematica','Interessi'];
+const STEP_COUNT = 5;
+
+function updateProgress(step) {
+  const pct = (step / STEP_COUNT) * 100;
+  $('progress-fill').style.width = pct + '%';
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active','completed');
+    if(i < step) dot.classList.add('completed');
+    else if(i === step) dot.classList.add('active');
+  });
+}
+
+// ─── STEP 0: BACKGROUND ───
+function renderBackground() {
+  updateProgress(0);
+  $('step-container').innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">👤</div>
+      <div>
+        <div class="card-title">Informazioni di Base</div>
+        <div class="card-subtitle">Questi dati sono raccolti solo per scopi di ricerca e non influenzano il tuo profilo scolastico.</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="genere">Genere</label>
+        <select id="genere">
+          <option value="">— Scegli —</option>
+          <option>Maschio</option><option>Femmina</option>
+          <option>Non binario</option><option>Preferisco non rispondere</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="anno">Anno di nascita</label>
+        <input type="number" id="anno" min="2006" max="2014" placeholder="es. 2011">
+      </div>
+      <div class="form-group">
+        <label for="nascita_studente">Paese di nascita (tuo)</label>
+        <input type="text" id="nascita_studente" placeholder="es. Italia">
+      </div>
+      <div class="form-group">
+        <label for="nascita_madre">Paese di nascita della madre</label>
+        <input type="text" id="nascita_madre" placeholder="es. Italia">
+      </div>
+      <div class="form-group">
+        <label for="nascita_padre">Paese di nascita del padre</label>
+        <input type="text" id="nascita_padre" placeholder="es. Italia">
+      </div>
+      <div class="form-group">
+        <label for="titolo_madre">Titolo di studio della madre</label>
+        <select id="titolo_madre">
+          <option value="">— Scegli —</option>
+          <option>Nessun titolo</option><option>Licenza elementare</option>
+          <option>Licenza media</option><option>Diploma superiore</option>
+          <option>Laurea triennale</option><option>Laurea magistrale o superiore</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="titolo_padre">Titolo di studio del padre</label>
+        <select id="titolo_padre">
+          <option value="">— Scegli —</option>
+          <option>Nessun titolo</option><option>Licenza elementare</option>
+          <option>Licenza media</option><option>Diploma superiore</option>
+          <option>Laurea triennale</option><option>Laurea magistrale o superiore</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="occ_madre">Occupazione della madre</label>
+        <select id="occ_madre">
+          <option value="">— Scegli —</option>
+          <option>Disoccupata/casalinga</option><option>Operaia/artigiana</option>
+          <option>Impiegata</option><option>Libera professionista</option>
+          <option>Dirigente/imprenditrice</option><option>Altro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="occ_padre">Occupazione del padre</label>
+        <select id="occ_padre">
+          <option value="">— Scegli —</option>
+          <option>Disoccupato</option><option>Operaio/artigiano</option>
+          <option>Impiegato</option><option>Libero professionista</option>
+          <option>Dirigente/imprenditore</option><option>Altro</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="submitBackground()">Avanti →</button>
+    </div>
+  </div>`;
+}
+
+function submitBackground() {
+  const fields = ['genere','anno','nascita_studente','nascita_madre','nascita_padre','titolo_madre','titolo_padre','occ_madre','occ_padre'];
+  let valid = true;
+  fields.forEach(f => {
+    const el = $(f);
+    if(!el.value.trim()) { el.classList.add('invalid'); valid=false; }
+    else el.classList.remove('invalid');
+  });
+  if(!valid) { alert('Per favore compila tutti i campi prima di procedere.'); return; }
+  fields.forEach(f => { state.background[f] = $(f).value; });
+  state.currentStep = 1;
+  renderCFT();
+}
+
+// ─── STEP 1: CFT ───
+const CFT_SUBTESTS = [
+  { key:'serie', label:'Serie', items:CFT_SERIES, time:240, instruction:'Osserva la sequenza di figure a sinistra. Quale delle cinque figure a destra completa correttamente la serie?' },
+  { key:'classif', label:'Classificazioni', items:CFT_CLASSIF, time:240, instruction:'Guarda le cinque figure. Quattro di esse condividono una caratteristica comune. Quale figura è diversa dalle altre?' },
+  { key:'matrici', label:'Matrici', items:CFT_MATRICI, time:240, instruction:'Osserva la matrice 3×3. La casella in basso a destra manca. Quale delle cinque figure la completa correttamente?' },
+  { key:'topo', label:'Topologia', items:CFT_TOPOLOGIA, time:180, instruction:'Osserva la figura di riferimento con il punto rosso. Scegli la figura a destra in cui il punto mantiene la stessa relazione con le forme (dentro/fuori/sul bordo).' }
+];
+
+let cftTimer = null;
+
+function renderCFT() {
+  updateProgress(1);
+  const st = CFT_SUBTESTS[state.cft.currentSubtest];
+  const items = st.items;
+  const itemIdx = state.cft.currentItem;
+  const item = items[itemIdx];
+  const answers = state.cft.answers[st.key];
+  const totalItems = items.length;
+  const timeLeft = state.cft.timeLeft[st.key];
+
+  $('step-container').innerHTML = `
+  <div class="note-box">
+    <span class="note-icon">ℹ️</span>
+    <span><strong>Nota per la ricerca:</strong> In un'implementazione reale, questo test verrebbe somministrato da uno psicologo in presenza con tempi rigorosi. Questa versione è una simulazione dimostrativa per il progetto di ricerca. [In implementazione reale: immagini CFT 20-R originali fornite dall'editore Hogrefe]</span>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🧠</div>
+      <div>
+        <div class="card-title">Test di Ragionamento Logico — Subtest ${state.cft.currentSubtest+1}: ${st.label}</div>
+        <div class="card-subtitle">Domanda ${itemIdx+1} di ${totalItems}</div>
+      </div>
+    </div>
+
+    <div class="timer-bar" id="timer-bar">
+      <span class="timer-label">⏱ Tempo:</span>
+      <span class="timer-display" id="timer-display">${formatTime(timeLeft)}</span>
+      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:${(timeLeft/st.time)*100}%"></div></div>
+    </div>
+
+    <div class="subtest-instruction">${st.instruction}</div>
+
+    <div class="question-area" id="question-area">
+      <div class="question-number">Subtest ${state.cft.currentSubtest+1} — Domanda ${itemIdx+1}</div>
+      <div class="question-text">${item.question}</div>
+      <div id="item-content"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="skipSubtest()">Salta subtest →</button>
+      <div style="display:flex;gap:10px;">
+        ${itemIdx > 0 ? '<button class="btn btn-outline" onclick="cftPrev()">← Indietro</button>' : ''}
+        <button class="btn btn-primary" id="cft-next-btn" onclick="cftNext()" disabled>Avanti →</button>
+      </div>
+    </div>
+  </div>`;
+
+  renderCFTItem(item, st.key, itemIdx, answers[itemIdx]);
+  if(cftTimer) clearInterval(cftTimer);
+  startCFTTimer(st);
+}
+
+function renderCFTItem(item, key, idx, currentAnswer) {
+  const container = $('item-content');
+  if(key === 'serie') {
+    container.innerHTML = `
+    <div class="series-container">
+      ${item.seq.map(s=>`<div class="series-item">${s}</div>`).join('<span class="series-arrow">→</span>')}
+      <span class="series-arrow">→</span>
+      <div class="series-item missing" title="?"><span style="font-size:24px;color:#93c5fd;">?</span></div>
+    </div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:8px;font-weight:700;">Scegli la risposta corretta:</div>
+    <div class="choices-row">
+      ${item.choices.map((c,i)=>`
+      <div class="choice-item ${currentAnswer===i?'selected':''}" onclick="selectCFTAnswer(${i},'${key}')">
+        <div class="choice-box">${c.svg}</div>
+        <div class="choice-letter">${String.fromCharCode(65+i)}</div>
+      </div>`).join('')}
+    </div>`;
+  } else if(key === 'classif') {
+    container.innerHTML = `
+    <div class="classif-container">
+      ${item.items.map((s,i)=>`
+      <div class="choice-item ${currentAnswer===i?'selected':''}" onclick="selectCFTAnswer(${i},'${key}')">
+        <div class="choice-box">${s}</div>
+        <div class="choice-letter">${String.fromCharCode(65+i)}</div>
+      </div>`).join('')}
+    </div>`;
+  } else if(key === 'matrici') {
+    container.innerHTML = `
+    <div class="matrix-grid">
+      ${item.grid.map((cell,i)=>i===8?'<div class="matrix-cell missing"><span style="font-size:18px;color:#93c5fd;">?</span></div>':`<div class="matrix-cell">${cell||''}</div>`).join('')}
+    </div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:8px;font-weight:700;">Scegli la risposta corretta:</div>
+    <div class="choices-row">
+      ${item.choices.map((c,i)=>`
+      <div class="choice-item ${currentAnswer===i?'selected':''}" onclick="selectCFTAnswer(${i},'${key}')">
+        <div class="choice-box">${c.svg}</div>
+        <div class="choice-letter">${String.fromCharCode(65+i)}</div>
+      </div>`).join('')}
+    </div>`;
+  } else if(key === 'topo') {
+    container.innerHTML = `
+    <div class="topology-container">
+      <div class="topology-reference">
+        <div class="topology-label">FIGURA DI RIFERIMENTO</div>
+        <div class="series-item" style="width:90px;height:90px;">${item.ref}</div>
+      </div>
+      <div style="font-size:24px;color:#94a3b8;align-self:center;">→</div>
+      <div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:8px;font-weight:700;">Scegli dove si trova il punto:</div>
+        <div class="choices-row">
+          ${item.choices.map((c,i)=>`
+          <div class="choice-item ${currentAnswer===i?'selected':''}" onclick="selectCFTAnswer(${i},'${key}')">
+            <div class="choice-box" style="width:80px;height:80px;">${c.svg}</div>
+            <div class="choice-letter">${String.fromCharCode(65+i)}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+function selectCFTAnswer(idx, key) {
+  const itemIdx = state.cft.currentItem;
+  state.cft.answers[key][itemIdx] = idx;
+  const items = CFT_SUBTESTS[state.cft.currentSubtest].items;
+  renderCFTItem(items[itemIdx], key, itemIdx, idx);
+  $('cft-next-btn').disabled = false;
+}
+
+function cftNext() {
+  const st = CFT_SUBTESTS[state.cft.currentSubtest];
+  const items = st.items;
+  if(state.cft.currentItem < items.length - 1) {
+    state.cft.currentItem++;
+    renderCFT();
+  } else {
+    advanceSubtest();
+  }
+}
+
+function cftPrev() {
+  if(state.cft.currentItem > 0) {
+    state.cft.currentItem--;
+    renderCFT();
+  }
+}
+
+function skipSubtest() {
+  if(confirm('Vuoi saltare questo subtest e passare al successivo?')) advanceSubtest();
+}
+
+function advanceSubtest() {
+  clearInterval(cftTimer);
+  const cftBtnMap = {0:'db-cft1',1:'db-cft2',2:'db-cft3',3:'db-cft4'};
+  if(state.cft.currentSubtest < 3) {
+    state.cft.currentSubtest++;
+    state.cft.currentItem = 0;
+    // sync demo bar
+    Object.values(cftBtnMap).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+    const nb = document.getElementById(cftBtnMap[state.cft.currentSubtest]);
+    if(nb) nb.classList.add('active');
+    renderCFT();
+  } else {
+    state.currentStep = 2;
+    Object.values(cftBtnMap).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+    const itBtn = document.getElementById('db-it');
+    if(itBtn) itBtn.classList.add('active');
+    renderInvalsiItaliano();
+  }
+}
+
+function startCFTTimer(st) {
+  const key = st.key;
+  cftTimer = setInterval(() => {
+    state.cft.timeLeft[key]--;
+    const tl = state.cft.timeLeft[key];
+    const disp = $('timer-display');
+    const fill = $('timer-fill');
+    if(disp) {
+      disp.textContent = formatTime(tl);
+      disp.className = 'timer-display' + (tl < 30 ? ' warning' : '');
+    }
+    if(fill) {
+      fill.style.width = (tl/st.time*100) + '%';
+      fill.className = 'timer-fill' + (tl < 30 ? ' warning' : '');
+    }
+    if(tl <= 0) {
+      clearInterval(cftTimer);
+      alert(`Tempo scaduto per il subtest "${st.label}". Passaggio al subtest successivo.`);
+      advanceSubtest();
+    }
+  }, 1000);
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs/60).toString().padStart(2,'0');
+  const s = (secs%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+// ─── STEP 2A: INVALSI ITALIANO ───
+function renderInvalsiItaliano() {
+  updateProgress(2);
+  const q = state.invalsi_it.currentQ;
+  const item = INVALSI_ITALIANO_Qs[q];
+  const ans = state.invalsi_it.answers;
+
+  $('step-container').innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-amber">📖</div>
+      <div>
+        <div class="card-title">Comprensione del Testo e Lingua Italiana</div>
+        <div class="card-subtitle">Leggi il testo e rispondi alle domande.</div>
+      </div>
+    </div>
+
+    <div class="invalsi-text">${INVALSI_ITALIANO_TEXT}</div>
+
+    <div class="question-nav-dots">
+      ${INVALSI_ITALIANO_Qs.map((qi,i)=>`
+      <div class="q-dot ${ans[i]!==null?'answered':''} ${i===q?'current':''}" onclick="goToItalQ(${i})">${i+1}</div>
+      `).join('')}
+    </div>
+
+    <div class="question-area">
+      <div class="question-number">Domanda ${q+1} di ${INVALSI_ITALIANO_Qs.length} — <span style="background:var(--blue-pale);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:11px;">${item.tag}</span></div>
+      <div class="question-text">${item.text}</div>
+      <div class="mc-options">
+        ${item.options.map((opt,i)=>`
+        <div class="mc-option ${ans[q]===i?'selected':''}" onclick="selectItalAnswer(${i})">
+          <div class="mc-option-letter">${String.fromCharCode(65+i)}</div>
+          <div class="mc-option-text">${opt}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="btn-row">
+      ${q > 0 ? '<button class="btn btn-outline" onclick="italPrev()">← Indietro</button>' : '<span></span>'}
+      ${q < 14 ? '<button class="btn btn-primary" onclick="italNext()">Avanti →</button>'
+               : '<button class="btn btn-success" onclick="submitItaliano()">Completa Italiano ✓</button>'}
+    </div>
+  </div>`;
+}
+
+function selectItalAnswer(idx) {
+  state.invalsi_it.answers[state.invalsi_it.currentQ] = idx;
+  renderInvalsiItaliano();
+}
+
+function goToItalQ(i) { state.invalsi_it.currentQ = i; renderInvalsiItaliano(); }
+function italNext() { state.invalsi_it.currentQ++; renderInvalsiItaliano(); }
+function italPrev() { state.invalsi_it.currentQ--; renderInvalsiItaliano(); }
+
+function submitItaliano() {
+  const unanswered = state.invalsi_it.answers.filter(a=>a===null).length;
+  if(unanswered > 0) {
+    if(!confirm(`Hai ${unanswered} domande senza risposta. Vuoi procedere comunque?`)) return;
+  }
+  state.currentStep = 3;
+  renderInvalsiMatematica();
+}
+
+// ─── STEP 2B: INVALSI MATEMATICA ───
+function renderInvalsiMatematica() {
+  updateProgress(3);
+  const q = state.invalsi_math.currentQ;
+  const item = INVALSI_MATH_Qs[q];
+  const ans = state.invalsi_math.answers;
+
+  $('step-container').innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🔢</div>
+      <div>
+        <div class="card-title">Test di Matematica</div>
+        <div class="card-subtitle">Rispondi alle domande. Puoi navigare tra le domande liberamente.</div>
+      </div>
+    </div>
+
+    <div class="question-nav-dots">
+      ${INVALSI_MATH_Qs.map((qi,i)=>`
+      <div class="q-dot ${ans[i]!==null?'answered':''} ${i===q?'current':''}" onclick="goToMathQ(${i})">${i+1}</div>
+      `).join('')}
+    </div>
+
+    <div class="question-area">
+      <div class="question-number">
+        Domanda ${q+1} di ${INVALSI_MATH_Qs.length} — 
+        <span style="background:var(--blue-pale);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:11px;margin-right:4px;">${item.tag}</span>
+        <span style="background:var(--amber-pale);color:var(--amber);padding:2px 8px;border-radius:20px;font-size:11px;">${item.dim}</span>
+      </div>
+      <div class="question-text">${item.text}</div>
+      <div class="mc-options">
+        ${item.options.map((opt,i)=>`
+        <div class="mc-option ${ans[q]===i?'selected':''}" onclick="selectMathAnswer(${i})">
+          <div class="mc-option-letter">${String.fromCharCode(65+i)}</div>
+          <div class="mc-option-text">${opt}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="btn-row">
+      ${q > 0 ? '<button class="btn btn-outline" onclick="mathPrev()">← Indietro</button>' : '<span></span>'}
+      ${q < 19 ? '<button class="btn btn-primary" onclick="mathNext()">Avanti →</button>'
+               : '<button class="btn btn-success" onclick="submitMatematica()">Completa Matematica ✓</button>'}
+    </div>
+  </div>
+  <div style="text-align:center;padding:12px 0;color:var(--gray-500);font-size:14px;">
+    Hai completato ${ans.filter(a=>a!==null).length} di 20 domande.
+  </div>`;
+}
+
+function selectMathAnswer(idx) {
+  state.invalsi_math.answers[state.invalsi_math.currentQ] = idx;
+  renderInvalsiMatematica();
+}
+
+function goToMathQ(i) { state.invalsi_math.currentQ = i; renderInvalsiMatematica(); }
+function mathNext() { state.invalsi_math.currentQ++; renderInvalsiMatematica(); }
+function mathPrev() { state.invalsi_math.currentQ--; renderInvalsiMatematica(); }
+
+function submitMatematica() {
+  const unanswered = state.invalsi_math.answers.filter(a=>a===null).length;
+  if(unanswered > 0) {
+    if(!confirm(`Hai ${unanswered} domande senza risposta. Vuoi procedere comunque?`)) return;
+  }
+  state.currentStep = 4;
+  renderMagellano();
+}
+
+// ─── STEP 3: MAGELLANO-STYLE INTEREST BATTERY ───
+
+const MAG_BLOCK_META = {
+  1: {
+    label: 'Blocco 1 — I tuoi interessi',
+    icon: '❤️',
+    color: 'icon-blue',
+    subtitle: 'Non ci sono risposte giuste o sbagliate. Per ogni attività descritta, indica quanto ti piacerebbe farla — indipendentemente da quanto sei bravo/a o da quanto guadagneresti.',
+    scale: [
+      { val:1, emoji:'😟', label:'Per niente' },
+      { val:2, emoji:'🙁', label:'Poco' },
+      { val:3, emoji:'😐', label:'Così così' },
+      { val:4, emoji:'🙂', label:'Mi piace' },
+      { val:5, emoji:'😊', label:'Molto' },
+    ],
+    items: () => state.magellano._b1,
+    totalLabel: 'attività valutate',
+    total: 56,
+  },
+  2: {
+    label: 'Blocco 2 — Cosa senti di saper imparare',
+    icon: '💪',
+    color: 'icon-amber',
+    subtitle: 'Queste domande riguardano quello che credi di poter imparare a fare. Non quello che sai già fare, ma quanto ti senti capace di acquisire queste competenze se ti impegnassi.',
+    scale: [
+      { val:1, emoji:'😟', label:'Non potrei mai' },
+      { val:2, emoji:'🙁', label:'Difficile' },
+      { val:3, emoji:'😐', label:'Non so' },
+      { val:4, emoji:'🙂', label:'Ce la farei' },
+      { val:5, emoji:'😊', label:'Sono sicuro/a' },
+    ],
+    items: () => state.magellano._b2,
+    totalLabel: 'domande valutate',
+    total: 24,
+  },
+  3: {
+    label: 'Blocco 3 — Il tuo futuro',
+    icon: '🔮',
+    color: 'icon-green',
+    subtitle: 'Queste domande riguardano quello che ti aspetti dal tuo futuro. Non quello che vorresti idealmente, ma quello che pensi che succederà davvero nel tuo percorso di vita.',
+    scale: [
+      { val:1, emoji:'😟', label:'Molto improbabile' },
+      { val:2, emoji:'🙁', label:'Poco probabile' },
+      { val:3, emoji:'😐', label:'Non so' },
+      { val:4, emoji:'🙂', label:'Probabile' },
+      { val:5, emoji:'😊', label:'Molto probabile' },
+    ],
+    items: () => state.magellano._b3,
+    totalLabel: 'domande valutate',
+    total: 12,
+  }
+};
+
+const MAG_ITEMS_PER_PAGE = 8;
+
+function renderMagellano() {
+  updateProgress(4);
+  const block = state.magellano.block;
+  const meta = MAG_BLOCK_META[block];
+  const items = meta.items();
+  const page = state.magellano.page;
+  const pageItems = items.slice(page * MAG_ITEMS_PER_PAGE, (page+1) * MAG_ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(items.length / MAG_ITEMS_PER_PAGE);
+  const answered = items.filter(i => state.magellano.answers[i.id]).length;
+  const totalAnswered = Object.keys(state.magellano.answers).length;
+  const isLastBlock = block === 3;
+  const isLastPage = page === totalPages - 1;
+
+  $('step-container').innerHTML = `
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    ${[1,2,3].map(b=>`
+    <div style="flex:1;padding:10px;border-radius:8px;text-align:center;font-size:13px;font-weight:800;
+      background:${b===block?'var(--navy)':'var(--gray-100)'};
+      color:${b===block?'white':'var(--gray-400)'};
+      border:2px solid ${b===block?'var(--navy)':'var(--gray-200)'};">
+      ${MAG_BLOCK_META[b].icon} Blocco ${b}
+      ${b < block ? '<span style="margin-left:4px;color:#34d399;">✓</span>' : ''}
+    </div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon ${meta.color}">${meta.icon}</div>
+      <div>
+        <div class="card-title">${meta.label}</div>
+        <div class="card-subtitle">${meta.subtitle}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:13px;color:var(--gray-500);">Pagina ${page+1} di ${totalPages}</div>
+      <div style="font-size:13px;color:var(--gray-600);font-weight:700;">${answered}/${meta.total} ${meta.totalLabel} (questo blocco)</div>
+      <div style="font-size:12px;color:var(--gray-400);">Totale: ${totalAnswered}/92</div>
+    </div>
+
+    ${pageItems.map((item) => `
+    <div class="riasec-item">
+      <div class="riasec-text">💬 ${item.text}</div>
+      <div class="riasec-scale">
+        ${meta.scale.map(s=>`
+        <div class="riasec-option ${state.magellano.answers[item.id]===s.val?'selected':''}"
+             onclick="selectMag('${item.id}',${s.val})">
+          <div class="riasec-emoji">${s.emoji}</div>
+          <div class="riasec-option-label">${s.label}</div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('')}
+
+    <div class="btn-row" style="margin-top:24px;">
+      ${page > 0
+        ? '<button class="btn btn-outline" onclick="magPrev()">← Indietro</button>'
+        : block > 1
+          ? '<button class="btn btn-outline" onclick="magPrevBlock()">← Blocco precedente</button>'
+          : '<span></span>'}
+      ${!isLastPage
+        ? '<button class="btn btn-primary" onclick="magNext()">Avanti →</button>'
+        : !isLastBlock
+          ? `<button class="btn btn-primary" onclick="magNextBlock()">Prossima sezione: ${MAG_BLOCK_META[block+1].icon} Blocco ${block+1} →</button>`
+          : '<button class="btn btn-success" onclick="submitMagellano()">Completa ✓</button>'}
+    </div>
+  </div>`;
+}
+
+function selectMag(id, val) {
+  state.magellano.answers[id] = val;
+  renderMagellano();
+}
+
+function magNext() {
+  const meta = MAG_BLOCK_META[state.magellano.block];
+  const items = meta.items();
+  const page = state.magellano.page;
+  const pageItems = items.slice(page*MAG_ITEMS_PER_PAGE, (page+1)*MAG_ITEMS_PER_PAGE);
+  const unanswered = pageItems.filter(i => !state.magellano.answers[i.id]).length;
+  if(unanswered > 0 && !confirm(`Hai ${unanswered} domande senza risposta in questa pagina. Continuare?`)) return;
+  state.magellano.page++;
+  renderMagellano();
+  window.scrollTo(0,0);
+}
+
+function magPrev() {
+  state.magellano.page--;
+  renderMagellano();
+  window.scrollTo(0,0);
+}
+
+function magNextBlock() {
+  const meta = MAG_BLOCK_META[state.magellano.block];
+  const items = meta.items();
+  const unanswered = items.filter(i => !state.magellano.answers[i.id]).length;
+  if(unanswered > 0 && !confirm(`Hai ${unanswered} domande senza risposta in questo blocco. Continuare?`)) return;
+  state.magellano.block++;
+  state.magellano.page = 0;
+  // sync demo bar
+  const btnMap = {1:'db-mag1',2:'db-mag2',3:'db-mag3'};
+  Object.values(btnMap).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  const nb = document.getElementById(btnMap[state.magellano.block]);
+  if(nb) nb.classList.add('active');
+  renderMagellano();
+  window.scrollTo(0,0);
+}
+
+function magPrevBlock() {
+  state.magellano.block--;
+  state.magellano.page = 0;
+  const btnMap = {1:'db-mag1',2:'db-mag2',3:'db-mag3'};
+  Object.values(btnMap).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  const nb = document.getElementById(btnMap[state.magellano.block]);
+  if(nb) nb.classList.add('active');
+  renderMagellano();
+  window.scrollTo(0,0);
+}
+
+function submitMagellano() {
+  const unanswered = MAG_ALL_ITEMS.filter(i => !state.magellano.answers[i.id]).length;
+  if(unanswered > 0 && !confirm(`Hai ${unanswered} domande senza risposta. Completare comunque?`)) return;
+  state.currentStep = 5;
+  renderCompletion();
+}
+
+// ─── COMPLETION ───
+function renderCompletion() {
+  updateProgress(5);
+  $('step-container').innerHTML = `
+  <div class="card completion-card">
+    <span class="completion-icon">🎉</span>
+    <h2 class="completion-title">Hai completato tutti i test!</h2>
+    <p class="completion-sub">Ottimo lavoro! I tuoi risultati sono stati registrati. Il tuo insegnante li analizzerà per aiutarti a scegliere il percorso scolastico più adatto a te.</p>
+    <div style="background:var(--green-pale);border:1px solid var(--green);border-radius:var(--radius-sm);padding:16px;margin-bottom:24px;font-size:15px;color:#065f46;">
+      ✅ <strong>Dati di background</strong> raccolti<br>
+      ✅ <strong>Test di Ragionamento Logico</strong> (CFT stile) completato<br>
+      ✅ <strong>INVALSI Italiano</strong> completato<br>
+      ✅ <strong>INVALSI Matematica</strong> completato<br>
+      ✅ <strong>Questionario Interessi</strong> (stile Magellano Junior 2 — Blocchi 1, 2, 3) completato
+    </div>
+    <p style="font-size:14px;color:var(--gray-500);">Per vedere il rapporto orientativo, chiedi al tuo insegnante di accedere alla sezione "Report Orientativo AI".</p>
+  </div>`;
+}
+
+// ─── RENDER SOMMINISTRAZIONE ───
+function renderSomministrazione() {
+  renderBackground();
+}
+
+// ─── SCORING ───
+function computeScores() {
+  // CFT
+  const cftAnswers = state.cft.answers;
+  const serieScore = CFT_SERIES.reduce((acc,item,i)=>acc+(cftAnswers.serie[i]===item.correct?1:0),0);
+  const classifScore = CFT_CLASSIF.reduce((acc,item,i)=>acc+(cftAnswers.classif[i]===item.correct?1:0),0);
+  const matriciScore = CFT_MATRICI.reduce((acc,item,i)=>acc+(cftAnswers.matrici[i]===item.correct?1:0),0);
+  const topoScore = CFT_TOPOLOGIA.reduce((acc,item,i)=>acc+(cftAnswers.topo[i]===item.correct?1:0),0);
+  const cftTotal = serieScore + classifScore + matriciScore + topoScore;
+
+  let qi, qiLabel;
+  if(cftTotal<=10){qi='70-84';qiLabel='Sotto la media';}
+  else if(cftTotal<=16){qi='85-99';qiLabel='Nella media';}
+  else if(cftTotal<=22){qi='100-114';qiLabel='Sopra la media';}
+  else if(cftTotal<=27){qi='115-129';qiLabel='Notevolmente sopra la media';}
+  else{qi='130+';qiLabel='Eccezionale';}
+
+  // INVALSI Italiano
+  const it = state.invalsi_it.answers;
+  const itScore = (tag) => {
+    const tagItems = INVALSI_ITALIANO_Qs.map((q,i)=>({...q,i})).filter(q=>q.tag===tag);
+    return tagItems.reduce((acc,q)=>acc+(it[q.i]===q.correct?1:0),0);
+  };
+  const ma1=itScore('MA1'), ma2=itScore('MA2'), ma3=itScore('MA3'), lessico=itScore('LESSICO'), gram=itScore('GRAMMATICA');
+  const itTotal = INVALSI_ITALIANO_Qs.reduce((acc,q,i)=>acc+(it[i]===q.correct?1:0),0);
+  const itPct = Math.round(itTotal/15*100);
+
+  // INVALSI Math
+  const math = state.invalsi_math.answers;
+  const mathByTag = {};
+  const mathByDim = {};
+  INVALSI_MATH_Qs.forEach((q,i)=>{
+    const correct = math[i]===q.correct;
+    if(!mathByTag[q.tag]) mathByTag[q.tag]={correct:0,total:0};
+    if(!mathByDim[q.dim]) mathByDim[q.dim]={correct:0,total:0};
+    mathByTag[q.tag].correct += correct?1:0;
+    mathByTag[q.tag].total++;
+    mathByDim[q.dim].correct += correct?1:0;
+    mathByDim[q.dim].total++;
+  });
+  const mathTotal = INVALSI_MATH_Qs.reduce((acc,q,i)=>acc+(math[i]===q.correct?1:0),0);
+  const mathPct = Math.round(mathTotal/20*100);
+  const tagPct = tag => Math.round((mathByTag[tag]?.correct||0)/(mathByTag[tag]?.total||1)*100);
+  const dimPct = dim => Math.round((mathByDim[dim]?.correct||0)/(mathByDim[dim]?.total||1)*100);
+
+  // MAGELLANO interest scores (0-100 per domain)
+  const magScores = computeMagScores(state.magellano.answers);
+  // Top 3 interest domains from Block 1
+  const topInterests = Object.entries(magScores.b1)
+    .sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+  // Top 2 self-efficacy clusters from Block 2
+  const topEfficacy = Object.entries(magScores.b2)
+    .sort((a,b)=>b[1]-a[1]).slice(0,2).map(e=>e[0]);
+
+  // CFT vs Math comparison
+  let cftMathNote = '';
+  if(cftTotal >= 23 && mathPct < 50) {
+    cftMathNote = `NOTA: Discrepanza significativa — CFT alto (QI ${qi}) ma INVALSI Matematica basso (${mathPct}%). Possibile potenziale non espresso o lacune specifiche nella matematica.`;
+  }
+
+  return {
+    cft: { total:cftTotal, serie:serieScore, classif:classifScore, matrici:matriciScore, topo:topoScore, qi, qiLabel },
+    italian: { MA1:ma1, MA2:ma2, MA3:ma3, LESSICO:lessico, GRAMMATICA:gram, total:itTotal, pct:itPct },
+    math: { 
+      NUMERI:tagPct('NUMERI'), SPAZIO_FIGURE:tagPct('SPAZIO_FIGURE'), 
+      RELAZIONI_FUNZIONI:tagPct('RELAZIONI_FUNZIONI'), DATI_PREVISIONI:tagPct('DATI_PREVISIONI'),
+      CONOSCERE:dimPct('CONOSCERE'), PROBLEM_SOLVING:dimPct('PROBLEM_SOLVING'), ARGOMENTARE:dimPct('ARGOMENTARE'),
+      total:mathTotal, pct:mathPct 
+    },
+    magellano: magScores,
+    topInterests,
+    topEfficacy,
+    holland: topInterests.join('-'),  // domain-based "code"
+    cftMathNote
+  };
+}
+
+// ─── TEACHER VIEW ───
+function renderTeacherView() {
+  $('teacher-container').innerHTML = `
+  <div class="teacher-header">
+    <h2>👩‍🏫 MIRA — Report Orientativo</h2>
+    <p>MIRA — <em>Multidimensional Instrument for Recommending Academic-track through AI</em>. Vista riservata all'insegnante.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-amber">👥</div>
+      <div>
+        <div class="card-title">Seleziona Studente</div>
+        <div class="card-subtitle">Profili dimostrativi precaricati per la ricerca, più il profilo attuale della sessione corrente.</div>
+      </div>
+    </div>
+    <div class="student-selector">
+      ${DEMO_STUDENTS.map(s=>`
+      <div class="student-card ${state.teacher.selectedStudent===s.id?'selected':''}" onclick="selectStudent('${s.id}')">
+        <div style="min-width:160px;">
+          <div class="student-card-name">${s.name}</div>
+          <div class="student-card-meta">${s.meta}</div>
+        </div>
+        <div class="student-card-tags" style="flex:1;">
+          ${s.tags.map(t=>`<span class="tag tag-blue">${t}</span>`).join('')}
+        </div>
+        ${DEMO_FLAGS[s.id] ? `
+        <div class="flag-badge" onclick="event.stopPropagation();openFlagModal('${s.id}')" style="${DEMO_FLAGS[s.id].resolved==='confirmed'?'background:#fff7ed;border-color:#d97706;color:#92400e;':DEMO_FLAGS[s.id].resolved==='revised'?'background:#d1fae5;border-color:#059669;color:#065f46;':''}">
+          ${DEMO_FLAGS[s.id].resolved==='confirmed'?'✋ Decisione confermata':DEMO_FLAGS[s.id].resolved==='revised'?'✅ Decisione rivista':'⚠️ Segnalazione MIRA — clicca per andare avanti'}
+        </div>` : `<div style="font-size:12px;color:var(--green);font-weight:700;white-space:nowrap;">✓ Nessuna discrepanza</div>`}
+      </div>`).join('')}
+      <div class="student-card ${state.teacher.selectedStudent==='current'?'selected':''}" onclick="selectStudent('current')">
+        <div style="min-width:160px;">
+          <div class="student-card-name">🔴 Sessione Corrente</div>
+          <div class="student-card-meta">Studente che ha appena completato i test</div>
+        </div>
+        <div style="flex:1;"><span class="tag tag-green">Dati in tempo reale</span></div>
+        <div style="font-size:12px;color:var(--gray-500);white-space:nowrap;">
+          ${state.currentStep >= 5 ? '✅ Test completati' : '⏳ Test non ancora completati'}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="student-scores-panel"></div>
+  <div id="teacher-rec-panel"></div>
+  <div id="report-panel"></div>`;
+
+  if(state.teacher.selectedStudent) renderStudentScores();
+}
+
+function selectStudent(id) {
+  state.teacher.selectedStudent = id;
+  state.teacher.reportText = '';
+  renderTeacherView();
+}
+
+function getStudentData(id) {
+  if(id === 'current') {
+    if(state.currentStep < 5) return null;
+    const scores = computeScores();
+    return {
+      name:'Studente corrente',
+      background: state.background,
+      cft: { total:scores.cft.total, serie:scores.cft.serie, classif:scores.cft.classif, matrici:scores.cft.matrici, topologia:scores.cft.topo, qi:scores.cft.qi, label:scores.cft.qiLabel },
+      invalsi_it: { MA1:scores.italian.MA1, MA2:scores.italian.MA2, MA3:scores.italian.MA3, LESSICO:scores.italian.LESSICO, GRAMMATICA:scores.italian.GRAMMATICA, total_pct:scores.italian.pct },
+      invalsi_math: { NUMERI:scores.math.NUMERI, SPAZIO_FIGURE:scores.math.SPAZIO_FIGURE, RELAZIONI_FUNZIONI:scores.math.RELAZIONI_FUNZIONI, DATI_PREVISIONI:scores.math.DATI_PREVISIONI, CONOSCERE:scores.math.CONOSCERE, PROBLEM_SOLVING:scores.math.PROBLEM_SOLVING, ARGOMENTARE:scores.math.ARGOMENTARE, total_pct:scores.math.pct },
+      magellano: scores.magellano,
+      topInterests: scores.topInterests,
+      topEfficacy: scores.topEfficacy,
+      holland: scores.holland,
+      teacherRec: state.teacher.teacherRec
+    };
+  }
+  return DEMO_STUDENTS.find(s=>s.id===id);
+}
+
+function renderStudentScores() {
+  const student = getStudentData(state.teacher.selectedStudent);
+  if(!student) {
+    $('student-scores-panel').innerHTML = `
+    <div class="card" style="text-align:center;padding:32px;color:var(--amber);">
+      ⚠️ Lo studente non ha ancora completato tutti i test. Completa prima la somministrazione.
+    </div>`;
+    return;
+  }
+
+  const cft = student.cft;
+  const it = student.invalsi_it;
+  const math = student.invalsi_math;
+  const mag = student.magellano || { b1:{}, b2:{}, b3:{} };
+
+  $('student-scores-panel').innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📊</div>
+      <div>
+        <div class="card-title">Profilo di ${student.name}</div>
+        <div class="card-subtitle">Riepilogo dei punteggi ai test somministrati</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:16px;" class="scores-grid">
+
+      <div>
+        <div class="report-section-title">🧠 CFT — Ragionamento Fluido</div>
+        <div style="background:var(--navy);color:white;border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;text-align:center;">
+          <div style="font-family:'Crimson Pro',serif;font-size:36px;font-weight:600;">${cft.total}/30</div>
+          <div style="font-size:13px;opacity:0.8;">QI stimato: <strong>${cft.qi}</strong></div>
+          <div style="font-size:12px;opacity:0.7;">${cft.label}</div>
+        </div>
+        ${[['Serie',cft.serie,8],['Classificazioni',cft.classif,8],['Matrici',cft.matrici,8],['Topologia',cft.topologia,6]].map(([l,v,max])=>`
+        <div style="margin-bottom:8px;">
+          <div class="score-label-row"><span class="score-label">${l}</span><span class="score-value">${v}/${max}</span></div>
+          <div class="score-bar-bg"><div class="score-bar-fill fill-blue" style="width:${v/max*100}%"></div></div>
+        </div>`).join('')}
+      </div>
+
+      <div>
+        <div class="report-section-title">📖 INVALSI Italiano — ${it.total_pct}%</div>
+        ${[['MA1 (Info esplicita)',it.MA1,3],['MA2 (Inferenza)',it.MA2,3],['MA3 (Riflessione)',it.MA3,3],['Lessico',it.LESSICO,3],['Grammatica',it.GRAMMATICA,3]].map(([l,v,max])=>`
+        <div style="margin-bottom:8px;">
+          <div class="score-label-row"><span class="score-label">${l}</span><span class="score-value">${v}/${max} (${Math.round(v/max*100)}%)</span></div>
+          <div class="score-bar-bg"><div class="score-bar-fill fill-amber" style="width:${v/max*100}%"></div></div>
+        </div>`).join('')}
+
+        <div class="report-section-title" style="margin-top:20px;">🔢 INVALSI Matematica — ${math.total_pct}%</div>
+        ${[['Numeri',math.NUMERI],['Spazio/Figure',math.SPAZIO_FIGURE],['Relazioni/Funzioni',math.RELAZIONI_FUNZIONI],['Dati/Previsioni',math.DATI_PREVISIONI]].map(([l,v])=>`
+        <div style="margin-bottom:8px;">
+          <div class="score-label-row"><span class="score-label">${l}</span><span class="score-value">${v}%</span></div>
+          <div class="score-bar-bg"><div class="score-bar-fill ${v>=60?'fill-green':v>=40?'fill-amber':'fill-red'}" style="width:${v}%"></div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="report-section-title">🎯 Profilo Interessi — Magellano Junior 2 (stile)</div>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:6px;">❤️ BLOCCO 1 — Interessi (top domini, score 0-100)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${Object.entries(mag.b1||{}).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([dom,val])=>`
+        <div style="flex:1;min-width:100px;background:${val>=60?'var(--blue-pale)':val>=40?'var(--gray-50)':'var(--red-pale)'};border:1px solid ${val>=60?'var(--blue)':val>=40?'var(--gray-200)':'var(--red)'};border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;color:var(--navy)">${val}</div>
+          <div style="font-size:10px;color:var(--gray-500);line-height:1.2;">${DOMAIN_LABELS[dom]||dom}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:800;color:var(--amber);margin-bottom:6px;">💪 BLOCCO 2 — Autoefficacia (cluster, score 0-100)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${Object.entries(mag.b2||{}).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([cl,val])=>`
+        <div style="flex:1;min-width:100px;background:${val>=60?'var(--amber-pale)':'var(--gray-50)'};border:1px solid ${val>=60?'var(--amber)':'var(--gray-200)'};border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;color:var(--navy)">${val}</div>
+          <div style="font-size:10px;color:var(--gray-500);line-height:1.2;">${DOMAIN_LABELS[cl]||cl}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:6px;">🔮 BLOCCO 3 — Propensione attesa (score 0-100)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${Object.entries(mag.b3||{}).sort((a,b)=>b[1]-a[1]).map(([dom,val])=>`
+        <div style="flex:1;min-width:90px;background:${val>=50?'var(--green-pale)':'var(--gray-50)'};border:1px solid ${val>=50?'var(--green)':'var(--gray-200)'};border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;color:var(--navy)">${val}</div>
+          <div style="font-size:10px;color:var(--gray-500);line-height:1.2;">${DOMAIN_LABELS[dom]||dom}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-top:12px;font-size:14px;color:var(--navy);font-weight:700;">
+      Domini di maggior interesse: <span style="background:var(--navy);color:white;padding:3px 10px;border-radius:20px;font-size:13px;">${(student.topInterests||[]).map(d=>DOMAIN_LABELS[d]||d).join(' · ')}</span>
+    </div>
+  </div>`;
+
+  $('teacher-rec-panel').innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-amber">🏫</div>
+      <div>
+        <div class="card-title">Consiglio dell'Insegnante</div>
+        <div class="card-subtitle">Seleziona il percorso che stai valutando per questo studente, poi genera il report AI.</div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label for="teacher-rec-select">Percorso consigliato dall'insegnante</label>
+      <select id="teacher-rec-select" onchange="state.teacher.teacherRec=this.value">
+        <option value="">— Seleziona percorso —</option>
+        <option ${student.teacherRec==='Liceo scientifico'?'selected':''}>Liceo scientifico</option>
+        <option ${student.teacherRec==='Liceo classico'?'selected':''}>Liceo classico</option>
+        <option ${student.teacherRec==='Liceo linguistico'?'selected':''}>Liceo linguistico</option>
+        <option ${student.teacherRec==='Liceo delle scienze umane'?'selected':''}>Liceo delle scienze umane</option>
+        <option ${student.teacherRec==='Istituto tecnico'?'selected':''}>Istituto tecnico</option>
+        <option ${student.teacherRec==='Istituto professionale'?'selected':''}>Istituto professionale</option>
+      </select>
+    </div>
+    <button class="btn btn-navy" onclick="generateReport()">🤖 Genera Report AI</button>
+  </div>`;
+
+  if(student.teacherRec) {
+    document.getElementById('teacher-rec-select').value = student.teacherRec;
+    state.teacher.teacherRec = student.teacherRec;
+  }
+}
+
+// ─── AI REPORT GENERATION ───
+async function generateReport() {
+  const student = getStudentData(state.teacher.selectedStudent);
+  const teacherRec = $('teacher-rec-select')?.value || state.teacher.teacherRec;
+  if(!student) { alert('Nessuno studente selezionato.'); return; }
+  if(!teacherRec) { alert('Seleziona un percorso consigliato prima di generare il report.'); return; }
+
+  // Serve hardcoded demo report instantly for presentation
+  if(DEMO_TEACHER_REPORTS[state.teacher.selectedStudent]) {
+    renderReport(DEMO_TEACHER_REPORTS[state.teacher.selectedStudent], teacherRec, student.teacherRec);
+    return;
+  }
+
+  $('report-panel').innerHTML = `
+  <div class="report-output">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <div style="font-size:15px;font-weight:700;color:var(--navy);">Analisi AI in corso…</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-top:6px;">Elaborazione del profilo orientativo. Attendere qualche istante.</div>
+    </div>
+  </div>`;
+
+  const cft = student.cft;
+  const it = student.invalsi_it;
+  const math = student.invalsi_math;
+  const mag = student.magellano || { b1:{}, b2:{}, b3:{} };
+
+  let cftMathNote = '';
+  if(cft.total >= 23 && math.total_pct < 50) {
+    cftMathNote = `ATTENZIONE: Discrepanza significativa — CFT totale ${cft.total}/30 (QI ${cft.qi}) ma INVALSI Matematica ${math.total_pct}%. Questo studente mostra un potenziale cognitivo elevato non riflesso nelle performance matematiche.`;
+  }
+
+  // Similar students
+  // Build similar students description — for Omar, include a near-identical peer who got Liceo Scientifico
+  let similarDesc;
+  if(state.teacher.selectedStudent === 'omar') {
+    similarDesc = `- Luca M. (italiano, padre ingegnere): CFT 25/30 (QI 115-129), Italiano 72%, Matematica 76%, Interessi: Scientifico-Naturale, Tecnico-Meccanico, Economico-Amm. → Consiglio insegnante: Liceo scientifico
+- Matteo R. (italiano): CFT 24/30 (QI 115-129), Italiano 68%, Matematica 82%, Interessi: Scientifico-Naturale, Tecnico-Meccanico → Consiglio insegnante: Liceo scientifico
+- Sofia Rossi: CFT 24/30 (QI 115-129), Italiano 87%, Matematica 40%, Interessi: Scientifico-Naturale, Storico-Letterario, Artistico → Consiglio insegnante: Liceo classico
+
+NOTA CRITICA PER IL MODELLO: Omar ha un profilo di test uguale o superiore a Luca M. e Matteo R. su tutte le dimensioni misurate (CFT, Matematica, profilo di interessi). L'unica differenza tra Omar e questi studenti è il background familiare e l'origine. Il consiglio per Istituto Tecnico non è supportato dai dati.`;
+  } else {
+    const otherStudents = DEMO_STUDENTS.filter(s=>s.id!==state.teacher.selectedStudent);
+    similarDesc = otherStudents.map(s=>`- ${s.name}: CFT ${s.cft.total}/30 (QI ${s.cft.qi}), Italiano ${s.invalsi_it.total_pct}%, Matematica ${s.invalsi_math.total_pct}%, Interessi: ${(s.topInterests||[]).map(d=>DOMAIN_LABELS[d]||d).join(', ')} → Consiglio insegnante: ${s.teacherRec}`).join('\n');
+  }
+
+  const systemPrompt = `Sei un esperto di orientamento scolastico che supporta gli insegnanti della scuola media italiana (terza media). Generi report strutturati e professionali in italiano basandoti sui punteggi ai test psicometrici e di interesse.
+
+BANCA DATI PERCORSI SCOLASTICI ITALIANI:
+"Liceo Scientifico: Richiede ragionamento logico-matematico forte e buona comprensione del testo. Adatto a studenti con CFT ≥ 105 (sopra la media), INVALSI Matematica ≥ 60%, performance forte in Relazioni/Funzioni e Problem Solving. Interessi prevalenti (Magellano B1): scientifico-naturale, tecnico-meccanico. Sbocchi: ingegneria, medicina, scienze, economia."
+
+"Liceo Classico: Richiede ragionamento verbale forte, pensiero critico e capacità analitica sui testi. Adatto a studenti con CFT ≥ 105, INVALSI Italiano forte specialmente MA3 (riflessione critica), MA2 (ricostruzione del significato), lessico nel quartile superiore. Interessi prevalenti (Magellano B1): storico-letterario, socioassistenziale, artistico frequenti. Sbocchi: giurisprudenza, lettere, filosofia, medicina."
+
+"Liceo Linguistico: Richiede forte comprensione del testo e consapevolezza linguistica. Adatto a studenti con INVALSI Italiano forte su tutte le dimensioni, CFT nella media o superiore, interesse per comunicazione e culture. Interessi prevalenti: linguistico-turistico, artistico, socioassistenziale. Sbocchi: traduzione, comunicazione, relazioni internazionali."
+
+"Liceo Scienze Umane: Richiede buona comprensione del testo, interesse per il comportamento umano e la società. INVALSI Italiano forte, Matematica nella media accettabile. Interessi prevalenti: socioassistenziale, educativo, storico-letterario. Sbocchi: psicologia, educazione, lavoro sociale."
+
+"Istituto Tecnico: Richiede solide basi matematiche specialmente in Numeri e Relazioni/Funzioni, dimensione Problem Solving forte, CFT nella media o superiore. Interessi prevalenti: tecnico-meccanico, economico-amministrativo, scientifico-naturale. Sbocchi: professioni tecniche, IT, ruoli da tecnico ingegneristico."
+
+"Istituto Professionale: Adatto quando gli interessi siano fortemente orientati verso domini pratici (es. tecnico-meccanico o agricolo nel Magellano B1), le lacune nei contenuti matematici e linguistici sono ampie e strutturali piuttosto che recuperabili nel breve termine, CFT nella media. IMPORTANTE: questo percorso NON è inferiore — porta a lavoro concreto qualificato ed eccellenza professionale. NON raccomandare questo percorso sulla base del background dello studente (genere, status migratorio, SES)."
+
+ISTRUZIONE ANTI-BIAS (CRITICA):
+Stai generando una raccomandazione di percorso basata SOLO su: (1) punteggi ai test, (2) profilo di interessi Magellano (Blocchi 1-3), (3) confronto con studenti con profili di test simili. NON DEVI MAI usare o inferire da: genere, status migratorio dello studente o dei genitori, livello di istruzione dei genitori, occupazione dei genitori, o background socioeconomico per generare la raccomandazione di percorso. Queste variabili di background sono raccolte solo per scopi di ricerca. Se noti che studenti con certe caratteristiche demografiche hanno storicamente ricevuto raccomandazioni di percorso inferiori, NON DEVI replicare questo pattern. La tua raccomandazione deve essere cieca alle variabili demografiche.
+
+LIMITAZIONE EMPIRICA FONDAMENTALE (da riportare nella Nota Metodologica):
+Le soglie decisionali utilizzate in questo sistema (es. CFT ≥ QI 105 per i licei, INVALSI Matematica ≥ 60% per il Liceo Scientifico, ecc.) sono derivate da meta-analisi internazionali, dai descrittori di livello INVALSI e dal giudizio di esperti — NON da dati longitudinali italiani empirici. La quantità empiricamente corretta — la probabilità condizionata di completare con successo il biennio superiore in un determinato percorso, dato il profilo INVALSI di terza media di uno studente — non è recuperabile dalle fonti pubbliche. Questi dati esistono nel pannello longitudinale ad accesso ristretto INVALSI-SNV (che collega gli studenti dalla terza media al biennio superiore con informazioni su percorso scelto ed esito), accessibile a ricercatori accreditati tramite la piattaforma CINECA (invalsi-areastatistica.cineca.it). Menziona esplicitamente questa limitazione nella sezione Nota Metodologica, indicando che la stima di distribuzioni di successo condizionate empiricamente validate per percorso costituisce una priorità per la fase due del progetto di ricerca.
+
+Genera il report ESCLUSIVAMENTE in italiano. Struttura il report con queste sezioni ESATTE (usa i titoli in maiuscolo come intestazioni):
+
+1. PROFILO DI INTERESSI PROFESSIONALI
+2. PROFILO COGNITIVO E ACCADEMICO
+   2a. Ragionamento Fluido (CFT)
+   2b. Competenze Linguistiche (INVALSI Italiano)
+   2c. Competenze Matematiche (INVALSI Matematica)
+3. CONFRONTO CON STUDENTI SIMILI
+4. RACCOMANDAZIONE AI
+5. NOTA METODOLOGICA
+
+Per la sezione CONFRONTO CON STUDENTI SIMILI: usa i profili degli studenti simili forniti nel messaggio utente. Se tra i dati compare un caso in cui uno studente con punteggi uguali o inferiori ha ricevuto una raccomandazione accademicamente più ambiziosa, segnalalo esplicitamente citando il nome e i punteggi di quell'altro studente. Questa comparazione diretta è il contributo più importante di questa sezione: l'insegnante deve poter vedere concretamente che due studenti con profili simili hanno ricevuto raccomandazioni diverse. Usa un tono neutro e fattuale, senza accuse.
+
+Per la sezione NOTA METODOLOGICA: spiega che le soglie sono derivate da meta-analisi internazionali e giudizio esperto (NON da dati longitudinali italiani), indica il dataset INVALSI-SNV/CINECA come fonte empirica necessaria per la fase due, e ricorda che questo strumento è di supporto alla decisione dell'insegnante, non sostitutivo.
+
+Se la raccomandazione AI differisce da quella dell'insegnante, aggiungi alla fine:
+SEGNALAZIONE: [spiega con chiarezza e senza accuse la discrepanza, chiedi se l'insegnante vuole riconsiderare]
+
+Tono: professionale ma accessibile. Circa 450-650 parole totali. Non usare elenchi puntati eccessivi.`;
+
+  const userMessage = `Risultati test dello studente ${student.name}:
+
+CFT 20-R (Ragionamento Fluido):
+- Punteggio grezzo totale: ${cft.total}/30
+- Punteggio standardizzato: QI ~${cft.qi} (${cft.label})
+- Subtest: Serie ${cft.serie}/8, Classificazioni ${cft.classif}/8, Matrici ${cft.matrici}/8, Topologia ${cft.topologia}/6
+${cftMathNote ? '\n' + cftMathNote : ''}
+
+INVALSI Italiano (${it.total_pct}%):
+- MA1 (Informazione esplicita): ${it.MA1}/3 (${Math.round(it.MA1/3*100)}%)
+- MA2 (Ricostruzione significato): ${it.MA2}/3 (${Math.round(it.MA2/3*100)}%)
+- MA3 (Riflessione critica): ${it.MA3}/3 (${Math.round(it.MA3/3*100)}%)
+- Lessico: ${it.LESSICO}/3 (${Math.round(it.LESSICO/3*100)}%)
+- Grammatica: ${it.GRAMMATICA}/3 (${Math.round(it.GRAMMATICA/3*100)}%)
+
+INVALSI Matematica (${math.total_pct}%):
+- Numeri: ${math.NUMERI}% | Spazio/Figure: ${math.SPAZIO_FIGURE}% | Relazioni/Funzioni: ${math.RELAZIONI_FUNZIONI}% | Dati/Previsioni: ${math.DATI_PREVISIONI}%
+- Conoscere: ${math.CONOSCERE}% | Problem Solving: ${math.PROBLEM_SOLVING}% | Argomentare: ${math.ARGOMENTARE}%
+
+Profilo di Interessi Professionali — Magellano Junior 2 (stile):
+Blocco 1 (Interessi, score 0-100 per dominio):
+${Object.entries(mag.b1||{}).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`- ${DOMAIN_LABELS[d]||d}: ${v}`).join('\n')}
+
+Blocco 2 (Autoefficacia percepita, score 0-100 per cluster):
+${Object.entries(mag.b2||{}).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`- ${DOMAIN_LABELS[d]||d}: ${v}`).join('\n')}
+
+Blocco 3 (Propensione attesa, score 0-100):
+${Object.entries(mag.b3||{}).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`- ${DOMAIN_LABELS[d]||d}: ${v}`).join('\n')}
+
+Domini di maggior interesse: ${(student.topInterests||[]).map(d=>DOMAIN_LABELS[d]||d).join(', ')}
+Cluster di maggior autoefficacia: ${(student.topEfficacy||[]).map(d=>DOMAIN_LABELS[d]||d).join(', ')}
+
+Consiglio dell'insegnante: ${teacherRec}
+
+Studenti simili nel dataset (abbinati solo sui punteggi ai test, demografia anonimizzata):
+${similarDesc}
+
+Genera il report orientativo strutturato in italiano.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2500,
+        system: systemPrompt,
+        messages:[{role:'user',content:userMessage}]
+      })
+    });
+    const data = await response.json();
+    if(data.content && data.content[0]) {
+      const text = data.content[0].text;
+      state.teacher.reportText = text;
+      renderReport(text, teacherRec, student.teacherRec);
+    } else {
+      throw new Error('No content in response');
+    }
+  } catch(err) {
+    $('report-panel').innerHTML = `
+    <div class="report-output" style="border:2px solid var(--red);">
+      <div style="color:var(--red);font-weight:700;margin-bottom:8px;">⚠️ Errore nella generazione del report</div>
+      <div style="font-size:14px;color:var(--gray-600);">Impossibile connettersi all'API di Anthropic. Assicurarsi di avere una connessione internet attiva e una chiave API valida configurata nell'app.<br><br>Errore tecnico: ${err.message}</div>
+    </div>`;
+  }
+}
+
+function renderReport(text, teacherRec, demoRec) {
+  // Parse sections
+  const sections = {
+    'PROFILO DI INTERESSI PROFESSIONALI':'',
+    'PROFILO COGNITIVO E ACCADEMICO':'',
+    'CONFRONTO CON STUDENTI SIMILI':'',
+    'RACCOMANDAZIONE AI':'',
+    'NOTA METODOLOGICA':'',
+    'SEGNALAZIONE':''
+  };
+
+  let currentSection = '';
+  const lines = text.split('\n');
+  for(const line of lines) {
+    let matched = false;
+    for(const key of Object.keys(sections)) {
+      if(line.toUpperCase().includes(key.toUpperCase())) {
+        currentSection = key;
+        matched = true;
+        break;
+      }
+    }
+    if(!matched && currentSection) {
+      sections[currentSection] += line + '\n';
+    }
+  }
+
+  const sectionIcons = {
+    'PROFILO DI INTERESSI PROFESSIONALI':'🎯',
+    'PROFILO COGNITIVO E ACCADEMICO':'🧠',
+    'CONFRONTO CON STUDENTI SIMILI':'👥',
+    'RACCOMANDAZIONE AI':'🏫',
+    'NOTA METODOLOGICA':'📋',
+    'SEGNALAZIONE':'⚠️'
+  };
+
+  let html = '<div class="report-output">';
+  html += `<div style="margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--navy);">`;
+  html += `<div style="font-family:'Crimson Pro',serif;font-size:26px;color:var(--navy);margin-bottom:4px;">Report Orientativo MIRA</div>`;
+  html += `<div style="font-size:13px;color:var(--gray-500);">Generato il ${new Date().toLocaleDateString('it-IT')} — Strumento di supporto alla decisione dell\'insegnante</div>`;
+  html += `</div>`;
+
+  for(const [key, content] of Object.entries(sections)) {
+    if(!content.trim()) continue;
+    const isSegnalazione = key === 'SEGNALAZIONE';
+    html += isSegnalazione
+      ? `<div class="segnalazione-box"><strong>⚠️ SEGNALAZIONE:</strong><br>${content.trim().replace(/\n/g,'<br>')}</div>`
+      : `<div class="report-section">
+          <div class="report-section-title">${sectionIcons[key]||''} ${key}</div>
+          <div class="report-body">${content.trim()}</div>
+        </div>`;
+  }
+
+  // If parsing didn't work well, just show raw
+  const hasContent = Object.values(sections).some(v=>v.trim());
+  if(!hasContent) {
+    html += `<div class="report-body">${text}</div>`;
+  }
+
+  // Empirical limitation footer
+  html += `
+  <div style="margin-top:28px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px;color:var(--gray-500);line-height:1.6;">
+    <strong style="color:var(--gray-600);">⚗️ Nota sulle soglie decisionali (Fase 1 del progetto):</strong>
+    Le soglie utilizzate per la segnalazione di discrepanze sono derivate da meta-analisi internazionali, descrittori di livello INVALSI e giudizio di esperti — non da dati longitudinali italiani empirici.
+    La quantità empiricamente corretta [P(successo biennio | profilo INVALSI terza media)] richiede accesso al pannello longitudinale <strong>INVALSI-SNV</strong> tramite piattaforma <strong>CINECA</strong> (<em>invalsi-areastatistica.cineca.it</em>).
+    La stima di distribuzioni di successo condizionate validate empiricamente per percorso è prevista nella <strong>Fase 2</strong> della ricerca.
+  </div>`;
+
+  html += '</div>';
+  $('report-panel').innerHTML = html;
+}
+
+// Init on load
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
